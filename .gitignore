@@ -9,8 +9,8 @@ lerna-debug.log*
 
 /frontend/node_modules
 /frontend/dist
-/backend/appsettings.Development.json
-/backend/appsettings.json
+/RecruitmentSystem/appsettings.Development.json
+/RecruitmentSystem/appsettings.json
 dist-ssr
 *.local
 
