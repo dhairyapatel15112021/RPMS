@@ -36,7 +36,7 @@ public class PositionController : ControllerBase
         }
     }
 
-    [HttpPost("/skill/add")]
+    [HttpPost("skill/add")]
     public async Task<ActionResult> addSkillToPosition([FromBody] PositionSkillMapModel positionSkillMapModel){
         try{
             // validation left

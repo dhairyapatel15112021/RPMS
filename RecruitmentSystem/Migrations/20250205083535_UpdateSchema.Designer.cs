@@ -12,7 +12,7 @@ using RecruitmentSystem.Data;
 namespace RecruitmentSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250204095527_UpdateSchema")]
+    [Migration("20250205083535_UpdateSchema")]
     partial class UpdateSchema
     {
         /// <inheritdoc />
@@ -79,6 +79,29 @@ namespace RecruitmentSystem.Migrations
                     b.HasKey("pk_candidate_id");
 
                     b.ToTable("Candidate");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.EmpRoleMapModel", b =>
+                {
+                    b.Property<int>("pk_role_map_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_role_map_id"));
+
+                    b.Property<int>("fk_emp_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("fk_role_id")
+                        .HasColumnType("int");
+
+                    b.HasKey("pk_role_map_id");
+
+                    b.HasIndex("fk_emp_id");
+
+                    b.HasIndex("fk_role_id");
+
+                    b.ToTable("RolesMap");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.EmployeesModel", b =>
@@ -203,6 +226,23 @@ namespace RecruitmentSystem.Migrations
                     b.ToTable("PositionSkillMap");
                 });
 
+            modelBuilder.Entity("RecruitmentSystem.Models.RoleModel", b =>
+                {
+                    b.Property<int>("pk_role_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_role_id"));
+
+                    b.Property<string>("role_type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("pk_role_id");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("RecruitmentSystem.Models.SkillsModel", b =>
                 {
                     b.Property<int>("pk_skills_id")
@@ -225,6 +265,25 @@ namespace RecruitmentSystem.Migrations
                     b.HasKey("pk_skills_id");
 
                     b.ToTable("Skills");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.EmpRoleMapModel", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.EmployeesModel", "Employees")
+                        .WithMany("RoleMap")
+                        .HasForeignKey("fk_emp_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RecruitmentSystem.Models.RoleModel", "Role")
+                        .WithMany("RoleMap")
+                        .HasForeignKey("fk_role_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employees");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.PositionModel", b =>
@@ -270,12 +329,19 @@ namespace RecruitmentSystem.Migrations
 
             modelBuilder.Entity("RecruitmentSystem.Models.EmployeesModel", b =>
                 {
+                    b.Navigation("RoleMap");
+
                     b.Navigation("positions");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.PositionModel", b =>
                 {
                     b.Navigation("PositionSkill");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.RoleModel", b =>
+                {
+                    b.Navigation("RoleMap");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.SkillsModel", b =>

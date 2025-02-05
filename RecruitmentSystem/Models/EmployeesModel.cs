@@ -31,4 +31,6 @@ public class EmployeesModel{
 
     public ICollection<PositionModel>? positions {get;}
 
+    public ICollection<EmpRoleMapModel>? RoleMap {get;}
+
 }

@@ -11,4 +11,6 @@ public interface IEmployeeService{
     Task<List<EmployeesModel>> getAllEmployees();
     Task<EmployeesModel> getEmployeeByEmail(string email);
     Task<EmployeesModel> getEmployeesById(int id);
+
+    EmployeesModel getEmployeesByIdSync(int id);
 }

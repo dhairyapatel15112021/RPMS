@@ -4,11 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecruitmentSystem.Controllers.Services;
 using RecruitmentSystem.Data;
+using RecruitmentSystem.Helper;
 using RecruitmentSystem.Services.Candidate;
 using RecruitmentSystem.Services.Employees;
 using RecruitmentSystem.Services.JWT;
 using RecruitmentSystem.Services.Position;
 using RecruitmentSystem.Services.PositionSkill;
+using RecruitmentSystem.Services.Role;
+using RecruitmentSystem.Services.RoleMap;
 using RecruitmentSystem.Services.Skills;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,7 +45,9 @@ builder.Services.AddScoped<ISkillsService, SkillsServiceImpl>();
 builder.Services.AddScoped<IPositionService, PositionServiceImpl>();
 builder.Services.AddScoped<IPositionSkillService, PositionSkillServiceImpl>();
 builder.Services.AddScoped<ICandidateService, CandidateServiceImpl>();
-builder.Services.AddScoped<IJwtService,JwtServiceImpl>();
+builder.Services.AddScoped<IJwtService, JwtServiceImpl>();
+builder.Services.AddScoped<IRoleService, RoleServiceImpl>();
+builder.Services.AddScoped<IRoleMapService, RoleMapServiceImpl>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -51,11 +56,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
+
+
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     dbContext.Database.Migrate();
 }
+
+app.UseMiddleware<JwtMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

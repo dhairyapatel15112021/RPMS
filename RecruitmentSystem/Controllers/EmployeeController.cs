@@ -29,7 +29,7 @@ public class EmployeeController : ControllerBase
                 throw new Exception("Please Enter Valid Data");
             }
             EmployeesModel is_employees_exist = await employeeService.getEmployeeByEmail(employees.emp_email);
-            CandidateModel is_candidate_exist = await candidateService.getCandidate(employees.emp_email);
+            CandidateModel is_candidate_exist = await candidateService.getCandidateByEmail(employees.emp_email);
             if (is_employees_exist != null || is_candidate_exist != null)
             {
                 throw new Exception("Already User Exist With This Email");
@@ -48,7 +48,7 @@ public class EmployeeController : ControllerBase
 
     }
 
-    [HttpGet("/get/all")]
+    [HttpGet("get/all")]
     public async Task<ActionResult<List<EmployeesModel>>> getAllEmployees()
     {
         try
@@ -64,7 +64,7 @@ public class EmployeeController : ControllerBase
         }
     }
 
-    [HttpGet("/get/{id}")]
+    [HttpGet("get/{id}")]
     public async Task<ActionResult<EmployeesModel>> getAllEmployee(int id)
     {
         try

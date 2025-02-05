@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentSystem.dto;
-using RecruitmentSystem.Models;
 using RecruitmentSystem.Services.Candidate;
 using RecruitmentSystem.Services.Employees;
 using RecruitmentSystem.Services.JWT;
@@ -17,7 +16,7 @@ public class AuthController : ControllerBase
 
     private readonly IJwtService jwtService;
 
-    private IConfiguration configuration;
+    private readonly IConfiguration configuration;
 
     public AuthController(IEmployeeService employeeService, ICandidateService candidateService, IJwtService jwtService, IConfiguration configuration)
     {
@@ -27,7 +26,8 @@ public class AuthController : ControllerBase
         this.configuration = configuration;
     }
 
-    [HttpPost("/login")]
+    [HttpPost]
+    [Route("login")]
     public async Task<ActionResult> login([FromBody] login login)
     {
         try
@@ -45,7 +45,7 @@ public class AuthController : ControllerBase
             {
                 throw new Exception("Data is Incorrect");
             }
-            string token = jwtService.generateToken(login.email, login.is_candidate, id, configuration);
+            string token = await jwtService.generateToken(login.email, login.is_candidate, id, configuration);
 
             return Ok(new { token });
         }

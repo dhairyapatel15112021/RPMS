@@ -4,7 +4,10 @@ namespace RecruitmentSystem.Services.Candidate;
 
 public interface ICandidateService
 {
-    Task<CandidateModel> getCandidate(string email);
+    Task<CandidateModel> getCandidateByEmail(string email);
 
+    Task<CandidateModel> getCandidateById(int id);
+
+    CandidateModel getCandidateByIdSync(int id);
     Task<int> checkCandidateCredentials(string name, string password);
 }

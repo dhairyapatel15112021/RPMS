@@ -17,7 +17,7 @@ public class CandidateServiceImpl : ICandidateService
     {
         try
         {
-            CandidateModel candidate = await getCandidate(email) ?? throw new Exception("Candidate Not Found");
+            CandidateModel candidate = await getCandidateByEmail(email) ?? throw new Exception("Candidate Not Found");
             bool verified = BCrypt.Net.BCrypt.Verify(password, candidate.candidate_password);
             if (!verified)
             {
@@ -31,8 +31,18 @@ public class CandidateServiceImpl : ICandidateService
             return -1;
         }
     }
-    public async Task<CandidateModel> getCandidate(string email)
+    public async Task<CandidateModel> getCandidateByEmail(string email)
     {
         return await _context.Candidate.FirstOrDefaultAsync(c => c.candidate_email == email);
+    }
+
+    public async Task<CandidateModel> getCandidateById(int id)
+    {
+        return await _context.Candidate.FirstOrDefaultAsync(c => c.pk_candidate_id == id);
+    }
+
+    public CandidateModel getCandidateByIdSync(int id)
+    {
+        return _context.Candidate.FirstOrDefault(c => c.pk_candidate_id == id);
     }
 }
