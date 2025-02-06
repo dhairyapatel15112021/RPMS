@@ -24,7 +24,7 @@ public class EmployeeController : ControllerBase
     {
         try
         {
-            if (employees.emp_contact_number.Trim().Length == 10 || employees.emp_name.Trim() == "" || employees.emp_email.Trim() == "" || employees.emp_designation.Trim() == "" || employees.emp_joining_date.ToString() == "")
+            if (employees.emp_contact_number == "" || employees.emp_contact_number.Trim().Length != 10 || employees.emp_name.Trim() == "" || employees.emp_email.Trim() == "" || employees.emp_designation.Trim() == "" || employees.emp_joining_date.ToString() == "")
             {
                 throw new Exception("Please Enter Valid Data");
             }

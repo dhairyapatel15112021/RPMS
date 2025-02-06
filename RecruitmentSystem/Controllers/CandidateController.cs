@@ -1,0 +1,97 @@
+
+using Microsoft.AspNetCore.Mvc;
+using RecruitmentSystem.Models;
+using RecruitmentSystem.Services.Candidate;
+using RecruitmentSystem.Services.Employees;
+using RecruitmentSystem.Services.Excel;
+
+namespace RecruitmentSystem.Controllers;
+
+[ApiController]
+[Route("/api/candidate")]
+public class CandidateController : ControllerBase
+{
+
+    public IEmployeeService employeeService;
+
+    public ICandidateService candidateService;
+
+    public IExcelService excelService;
+
+    public CandidateController(IEmployeeService employeeService, ICandidateService candidateService, IExcelService excelService)
+    {
+        this.employeeService = employeeService;
+        this.candidateService = candidateService;
+        this.excelService = excelService;
+    }
+
+    [HttpPost("add")]
+    public async Task<ActionResult> addCandidate([FromBody] CandidateModel candidate)
+    {
+        try
+        {
+            if (candidate.candidate_email.Trim() == "" || candidate.candidate_contact_number == "" || candidate.candidate_contact_number.Trim().Length != 10 || candidate.candidate_name.Trim() == "" || candidate.candidate_password.Trim() == "")
+            {
+                throw new Exception("Please Enter Valid Data");
+            }
+            ;
+            EmployeesModel is_employees_exist = await employeeService.getEmployeeByEmail(candidate.candidate_email);
+            CandidateModel is_candidate_exist = await candidateService.getCandidateByEmail(candidate.candidate_email);
+            if (is_employees_exist != null || is_candidate_exist != null)
+            {
+                throw new Exception("Already User Exist With This Email");
+            }
+            Boolean is_saved = await candidateService.addCandidate(candidate);
+            if (is_saved)
+            {
+                return Ok("Candidate Added");
+            }
+            throw new Exception("Candidate Not Saved");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("add/all")]
+    public async Task<ActionResult> addAllCandidate(IFormFile file)
+    {
+        try
+        {
+            if (file == null || file.Length == 0)
+            {
+                throw new Exception("File is empty");
+            }
+            List<Dictionary<string, string>> data = await excelService.extractData(file);
+            foreach (var dataEntry in data)
+            {
+                EmployeesModel is_employees_exist = await employeeService.getEmployeeByEmail(dataEntry["email"]);
+                CandidateModel is_candidate_exist = await candidateService.getCandidateByEmail(dataEntry["email"]);
+                if (is_employees_exist != null || is_candidate_exist != null)
+                {
+                    Console.WriteLine("Already Exist With This Email Id");
+                    continue;
+                }
+                CandidateModel candidate = new CandidateModel();
+                candidate.candidate_email = dataEntry["email"];
+                candidate.candidate_contact_number = dataEntry["contact"];
+                candidate.candidate_name = dataEntry["name"];
+                candidate.candidate_password = dataEntry["password"];
+                bool is_saved = await candidateService.addCandidate(candidate);
+                if (is_saved)
+                {
+                    Console.WriteLine("Candidate with email "+ candidate.candidate_email + " is saved");
+                }
+                else{
+                    Console.WriteLine("Candidate with email "+ candidate.candidate_email + " is not saved");
+                }
+            }
+            return Ok(data);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+}

@@ -12,7 +12,7 @@ using RecruitmentSystem.Data;
 namespace RecruitmentSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250205083535_UpdateSchema")]
+    [Migration("20250206120148_UpdateSchema")]
     partial class UpdateSchema
     {
         /// <inheritdoc />
@@ -33,14 +33,6 @@ namespace RecruitmentSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_candidate_id"));
 
-                    b.Property<string>("aadhar_card")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("cancle_cheque")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("candidate_contact_number")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -50,7 +42,6 @@ namespace RecruitmentSystem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("candidate_linkdien")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("candidate_name")
@@ -61,18 +52,7 @@ namespace RecruitmentSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("document_verification_status")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("hsc_marksheet")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("pan_card")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ssc_marksheet")
+                    b.Property<string>("role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

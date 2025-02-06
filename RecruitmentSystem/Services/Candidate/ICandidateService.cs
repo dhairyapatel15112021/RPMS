@@ -10,4 +10,6 @@ public interface ICandidateService
 
     CandidateModel getCandidateByIdSync(int id);
     Task<int> checkCandidateCredentials(string name, string password);
+
+    Task<bool> addCandidate(CandidateModel candidate);
 }

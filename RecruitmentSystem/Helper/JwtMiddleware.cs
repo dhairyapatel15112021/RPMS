@@ -56,6 +56,8 @@ namespace RecruitmentSystem.Helper
                 context.Items["User"] = is_candidate ? candidateService.getCandidateByIdSync(id) : employeeService.getEmployeesByIdSync(id);
                 Console.WriteLine("hi -1");
                 context.Items["is_candidate"] = is_candidate;
+
+                
             }
             catch (Exception ex)
             {

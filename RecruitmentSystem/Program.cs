@@ -8,6 +8,7 @@ using RecruitmentSystem.Data;
 using RecruitmentSystem.Helper;
 using RecruitmentSystem.Services.Candidate;
 using RecruitmentSystem.Services.Employees;
+using RecruitmentSystem.Services.Excel;
 using RecruitmentSystem.Services.JWT;
 using RecruitmentSystem.Services.Position;
 using RecruitmentSystem.Services.PositionSkill;
@@ -31,7 +32,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
-    
+
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -70,6 +71,7 @@ builder.Services.AddScoped<ICandidateService, CandidateServiceImpl>();
 builder.Services.AddScoped<IJwtService, JwtServiceImpl>();
 builder.Services.AddScoped<IRoleService, RoleServiceImpl>();
 builder.Services.AddScoped<IRoleMapService, RoleMapServiceImpl>();
+builder.Services.AddScoped<IExcelService,ExcelServiceImpl>();
 
 
 
@@ -90,7 +92,7 @@ app.UseAuthentication();
 
 app.UseMiddleware<JwtMiddleware>();
 
-app.UseAuthorization();
+// app.UseAuthorization();
 
 app.MapControllers();
 

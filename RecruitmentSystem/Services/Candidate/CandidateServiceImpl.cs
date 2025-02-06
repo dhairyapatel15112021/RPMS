@@ -1,3 +1,4 @@
+using BCrypt.Net;
 using Microsoft.EntityFrameworkCore;
 using RecruitmentSystem.Data;
 using RecruitmentSystem.Models;
@@ -11,6 +12,20 @@ public class CandidateServiceImpl : ICandidateService
     public CandidateServiceImpl(ApplicationDbContext context)
     {
         _context = context;
+    }
+
+    public async Task<bool> addCandidate(CandidateModel candidate)
+    {
+        try{
+            candidate.candidate_password = BCrypt.Net.BCrypt.HashPassword(candidate.candidate_password);
+             await _context.Candidate.AddAsync(candidate);
+             await _context.SaveChangesAsync();
+             return true;
+        }
+        catch(Exception ex){
+            Console.WriteLine(ex.Message);
+            return false;
+        }
     }
 
     public async Task<int> checkCandidateCredentials(string email, string password)
@@ -45,4 +60,6 @@ public class CandidateServiceImpl : ICandidateService
     {
         return _context.Candidate.FirstOrDefault(c => c.pk_candidate_id == id);
     }
+
+    
 }
