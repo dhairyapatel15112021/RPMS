@@ -17,14 +17,22 @@ public class JwtServiceImpl : IJwtService
     }
     public async Task<string> generateToken(string email, bool is_candidate, int id, IConfiguration _configuration)
     {
-        List<Claim> claims = new List<Claim>() {
+        // List<Claim> claims = new List<Claim>() {
+        //                 new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
+        //                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        //                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+        //                 new Claim("email", email),
+        //                 new Claim("is_candidate", is_candidate.ToString()),
+        //                 new Claim("id", id.ToString())
+        //             };
+                List<Claim> claims = new List<Claim>() {
                         new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                         new Claim("email", email),
                         new Claim("is_candidate", is_candidate.ToString()),
                         new Claim("id", id.ToString())
                     };
+       
         // get roles of id; 
         List<string> roles = await roleMapService.getRoles(id);
         foreach (var role in roles)

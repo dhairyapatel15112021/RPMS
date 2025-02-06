@@ -55,7 +55,7 @@ public class AdminController : ControllerBase
 
     [HttpGet]
     [Route("role/employee/map/{id}")]
-    [Authorize("admin")]
+    [Authorize(Roles ="admin")]
     public async Task<ActionResult> getRoles(int id)
     {
         try
