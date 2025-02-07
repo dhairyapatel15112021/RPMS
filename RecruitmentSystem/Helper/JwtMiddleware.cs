@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using RecruitmentSystem.Services.Candidate;
 using RecruitmentSystem.Services.Employees;
@@ -27,6 +28,9 @@ namespace RecruitmentSystem.Helper
             var token = context.Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last();
             if (token != null)
                 await attachUserToContext(context, employeeService, candidateService, token);
+            
+            Console.WriteLine(context.Items["User"]);
+            Console.WriteLine(context.Items["is_candidate"]);
             await _next(context);
         }
 
@@ -56,8 +60,8 @@ namespace RecruitmentSystem.Helper
                 context.Items["User"] = is_candidate ? candidateService.getCandidateByIdSync(id) : employeeService.getEmployeesByIdSync(id);
                 Console.WriteLine("hi -1");
                 context.Items["is_candidate"] = is_candidate;
-
-                
+                var identity = new ClaimsIdentity(jwtToken.Claims,JwtBearerDefaults.AuthenticationScheme);
+                context.User = new ClaimsPrincipal(identity);  
             }
             catch (Exception ex)
             {

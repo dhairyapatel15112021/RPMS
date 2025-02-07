@@ -25,7 +25,7 @@ public class SkillsController : ControllerBase
             {
                 throw new Exception("Please Enter Valid Data of skills");
             }
-            Boolean is_saved = skillsService.createSkill(skills);
+            Boolean is_saved = await skillsService.createSkill(skills);
             if (is_saved)
             {
                 return Ok("Skills Added");

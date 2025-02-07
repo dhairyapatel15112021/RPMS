@@ -37,11 +37,11 @@ public class JwtServiceImpl : IJwtService
         List<string> roles = await roleMapService.getRoles(id);
         foreach (var role in roles)
         {
-            claims.Add(new Claim("Role", Convert.ToString(role)));
+            claims.Add(new Claim(ClaimTypes.Role, Convert.ToString(role)));
         }
         if (roles.Count == 0)
         {
-            claims.Add(new Claim("Role", Convert.ToString("candidate")));
+            claims.Add(new Claim(ClaimTypes.Role, Convert.ToString("candidate")));
         }
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

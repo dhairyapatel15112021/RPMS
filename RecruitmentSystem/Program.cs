@@ -7,6 +7,7 @@ using RecruitmentSystem.Controllers.Services;
 using RecruitmentSystem.Data;
 using RecruitmentSystem.Helper;
 using RecruitmentSystem.Services.Candidate;
+using RecruitmentSystem.Services.Document;
 using RecruitmentSystem.Services.Employees;
 using RecruitmentSystem.Services.Excel;
 using RecruitmentSystem.Services.JWT;
@@ -38,28 +39,21 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// builder.Services.AddCors(options =>
-// {
-//     options.AddPolicy("AllowSpecificOrigin",
-//         builder =>
-//         {
-//             builder.WithOrigins("http://localhost:5173")
-//              .AllowAnyHeader()
-//              .AllowAnyMethod();
-//         });
-// });
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins",
-        builder => builder.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
+    options.AddPolicy("AllowSpecificOrigin",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:5173")
+             .AllowAnyHeader()
+             .AllowAnyMethod();
+        });
 });
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddCors();
 builder.Services.AddOpenApi();
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -71,7 +65,8 @@ builder.Services.AddScoped<ICandidateService, CandidateServiceImpl>();
 builder.Services.AddScoped<IJwtService, JwtServiceImpl>();
 builder.Services.AddScoped<IRoleService, RoleServiceImpl>();
 builder.Services.AddScoped<IRoleMapService, RoleMapServiceImpl>();
-builder.Services.AddScoped<IExcelService,ExcelServiceImpl>();
+builder.Services.AddScoped<IExcelService, ExcelServiceImpl>();
+builder.Services.AddScoped<IDocumentService, DocumentServiceImpl>();
 
 
 
@@ -86,13 +81,13 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
-app.UseCors("AllowAllOrigins");
+app.UseCors("AllowSpecificOrigin");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseMiddleware<JwtMiddleware>();
 
-// app.UseAuthorization();
+app.UseAuthorization();
 
 app.MapControllers();
 

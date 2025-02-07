@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using RecruitmentSystem.Data;
 using RecruitmentSystem.Models;
 
@@ -13,12 +14,12 @@ public class PositionSkillServiceImpl : IPositionSkillService
         _context = context;
     }
 
-    public bool addSkillToPosition(PositionSkillMapModel positionSkill)
+    public async Task<bool> addSkillToPosition(PositionSkillMapModel positionSkill)
     {
         try
         {
-            _context.PositionSkillMap.Add(positionSkill);
-            _context.SaveChanges();
+            await _context.PositionSkillMap.AddAsync(positionSkill);
+            await _context.SaveChangesAsync();
             return true;
         }
         catch (Exception ex)

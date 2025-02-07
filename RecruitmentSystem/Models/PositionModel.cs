@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,9 +20,10 @@ public class PositionModel{
     public String position_min_experience {get;set;}
 
     [Required]
-    public Boolean is_open {get;set;}
+    [DefaultValue(PositionStatus.open)]
+    public PositionStatus is_open {get;set;} = PositionStatus.open;
 
-    public String comments {get;set;}
+    public String? comments {get;set;}
 
     public String position_level {get;set;}
 
@@ -29,9 +31,9 @@ public class PositionModel{
     public String position_location {get;set;}
 
     [Required]
-    public DateTime position_creation_date {get;set;}
+    public DateTime? position_creation_date {get;set;} = DateTime.Now;
 
-    public String salary_range {get;set;}
+    public String? salary_range {get;set;}
 
     [Required]
     public String qualification {get;set;}

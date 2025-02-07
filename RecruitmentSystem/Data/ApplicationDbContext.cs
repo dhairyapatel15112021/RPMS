@@ -16,6 +16,8 @@ namespace RecruitmentSystem.Data
 
         public DbSet<EmpRoleMapModel> RolesMap { get; set; }
 
+        public DbSet<DocuementModel> Docuements { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -27,6 +29,7 @@ namespace RecruitmentSystem.Data
             modelBuilder.Entity<PositionSkillMapModel>().HasKey(e => e.pk_position_skill_id);
             modelBuilder.Entity<RoleModel>().HasKey(e => e.pk_role_id);
             modelBuilder.Entity<EmpRoleMapModel>().HasKey(e => e.pk_role_map_id);
+            modelBuilder.Entity<DocuementModel>().HasKey(e => e.pk_document_id);
 
             // Registering Relationship
 
@@ -81,6 +84,7 @@ namespace RecruitmentSystem.Data
                 .IsRequired();
 
             // relationship for employee and roles
+
             modelBuilder.Entity<EmployeesModel>()
             .HasMany(e => e.RoleMap)
             .WithOne(e => e.Employees)
@@ -104,6 +108,34 @@ namespace RecruitmentSystem.Data
             .WithMany(e => e.RoleMap)
             .HasForeignKey(e => e.fk_role_id)
             .IsRequired();
+
+            // relationship between document and candidate
+            modelBuilder.Entity<CandidateModel>()
+            .HasMany(e => e.Document)
+            .WithOne(e => e.candidate)
+            .HasForeignKey(e => e.fk_candidate_id)
+            .HasPrincipalKey(e => e.pk_candidate_id)
+            .IsRequired(false);
+
+            modelBuilder.Entity<DocuementModel>()
+            .HasOne(e => e.candidate)
+            .WithMany(e => e.Document)
+            .HasForeignKey(e => e.fk_candidate_id)
+            .IsRequired(false);
+
+            // relationship between document and employee
+            modelBuilder.Entity<EmployeesModel>()
+            .HasMany(e => e.Document)
+            .WithOne(e => e.employees)
+            .HasForeignKey(e => e.fk_emp_id)
+            .HasPrincipalKey(e => e.pk_emp_id)
+            .IsRequired(false);
+
+            modelBuilder.Entity<DocuementModel>()
+            .HasOne(e => e.employees)
+            .WithMany(e => e.Document)
+            .HasForeignKey(e => e.fk_emp_id)
+            .IsRequired(false);
 
         }
 

@@ -1,4 +1,7 @@
+using Azure;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 using RecruitmentSystem.Services.Position;
 using RecruitmentSystem.Services.PositionSkill;
@@ -12,20 +15,21 @@ public class PositionController : ControllerBase
     private IPositionService positionService;
     private IPositionSkillService positionSkillService;
 
-    public PositionController(IPositionService positionService,IPositionSkillService positionSkillService)
+    public PositionController(IPositionService positionService, IPositionSkillService positionSkillService)
     {
         this.positionService = positionService;
         this.positionSkillService = positionSkillService;
     }
 
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<ActionResult> createOpening([FromBody] PositionModel position)
     {
         try
         {
             // validatation left
-            Boolean is_saved = positionService.createOpening(position);
-            if(is_saved){
+            Boolean is_saved = await positionService.createOpening(position);
+            if (is_saved)
+            {
                 return Ok("Position Created");
             }
             throw new Exception("Position Is not saved");
@@ -36,17 +40,90 @@ public class PositionController : ControllerBase
         }
     }
 
+    [HttpPatch("hold/{positionId}")]
+    public async Task<ActionResult> holdOpening(int positionId, [FromBody] JsonPatchDocument<HoldPostion> holdPosition)
+    {
+        try
+        {
+            if (positionId == 0 || holdPosition == null)
+            {
+                throw new Exception("Please Enter Valid Data");
+            }
+
+            bool is_updated = await positionService.holdOpening(positionId, holdPosition);
+            if (!is_updated)
+            {
+                throw new Exception("No Updated");
+            }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+
+    [HttpPatch("close/{positionId}")]
+    public async Task<ActionResult> closeOpening(int positionId, [FromBody] JsonPatchDocument<ClosePostion> closePosition)
+    {
+        try
+        {
+            if (positionId == 0 || closePosition == null)
+            {
+                throw new Exception("Please Enter Valid Data");
+            }
+
+            bool is_updated = await positionService.closeOpening(positionId, closePosition);
+            if (!is_updated)
+            {
+                throw new Exception("No Updated");
+            }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPut("open/{positionId}")]
+    public async Task<ActionResult> openOpening(int positionId)
+    {
+        try
+        {
+            if (positionId == 0)
+            {
+                throw new Exception("Please Enter Valid Data");
+            }
+            bool is_updated = await positionService.openOpening(positionId);
+            if (!is_updated)
+            {
+                throw new Exception("No Updated");
+            }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPost("skill/add")]
-    public async Task<ActionResult> addSkillToPosition([FromBody] PositionSkillMapModel positionSkillMapModel){
-        try{
+    public async Task<ActionResult> addSkillToPosition([FromBody] PositionSkillMapModel positionSkillMapModel)
+    {
+        try
+        {
             // validation left
-            bool is_saved = positionSkillService.addSkillToPosition(positionSkillMapModel);
-            if(is_saved){
-                  return Ok("Added");
+            bool is_saved = await positionSkillService.addSkillToPosition(positionSkillMapModel);
+            if (is_saved)
+            {
+                return Ok("Added");
             }
             throw new Exception("Not Saved");
         }
-        catch(Exception ex){
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }

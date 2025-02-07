@@ -15,13 +15,13 @@ public class EmployeeServiceImpl : IEmployeeService
     _context = context;
   }
 
-  public Boolean addEmployees(EmployeesModel employees)
+  public async Task<Boolean> addEmployees(EmployeesModel employees)
   {
     try
     {
       employees.emp_password = BCrypt.Net.BCrypt.HashPassword(employees.emp_password);
-      _context.Employees.Add(employees);
-      _context.SaveChanges();
+      await _context.Employees.AddAsync(employees);
+      await _context.SaveChangesAsync();
       return true;
     }
     catch (Exception ex)

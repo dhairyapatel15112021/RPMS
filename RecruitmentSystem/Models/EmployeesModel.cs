@@ -33,4 +33,6 @@ public class EmployeesModel{
 
     public ICollection<EmpRoleMapModel>? RoleMap {get;}
 
+     public ICollection<DocuementModel>? Document {get;}
+
 }

@@ -4,5 +4,5 @@ namespace RecruitmentSystem.Services.Skills;
 
 public interface ISkillsService{
 
-    Boolean createSkill(SkillsModel skil);
+    Task<Boolean> createSkill(SkillsModel skil);
 }

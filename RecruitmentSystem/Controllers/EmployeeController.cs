@@ -34,7 +34,7 @@ public class EmployeeController : ControllerBase
             {
                 throw new Exception("Already User Exist With This Email");
             }
-            Boolean is_saved = employeeService.addEmployees(employees);
+            Boolean is_saved = await employeeService.addEmployees(employees);
             if (is_saved)
             {
                 return Ok("Employee Added");

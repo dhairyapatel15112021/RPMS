@@ -58,6 +58,46 @@ namespace RecruitmentSystem.Migrations
                     b.ToTable("Candidate");
                 });
 
+            modelBuilder.Entity("RecruitmentSystem.Models.DocuementModel", b =>
+                {
+                    b.Property<int>("pk_document_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_document_id"));
+
+                    b.Property<string>("document_file_path")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("document_type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("document_verification_status")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("fk_candidate_id")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("fk_emp_id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("uploaded_at")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("verified_at")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("pk_document_id");
+
+                    b.HasIndex("fk_candidate_id");
+
+                    b.HasIndex("fk_emp_id");
+
+                    b.ToTable("Docuements");
+                });
+
             modelBuilder.Entity("RecruitmentSystem.Models.EmpRoleMapModel", b =>
                 {
                     b.Property<int>("pk_role_map_id")
@@ -126,7 +166,6 @@ namespace RecruitmentSystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_position_id"));
 
                     b.Property<string>("comments")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("fk_candidate_key")
@@ -135,8 +174,8 @@ namespace RecruitmentSystem.Migrations
                     b.Property<int>("fk_emp_id")
                         .HasColumnType("int");
 
-                    b.Property<bool>("is_open")
-                        .HasColumnType("bit");
+                    b.Property<int>("is_open")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("position_creation_date")
                         .HasColumnType("datetime2");
@@ -166,7 +205,6 @@ namespace RecruitmentSystem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("salary_range")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("pk_position_id");
@@ -244,6 +282,21 @@ namespace RecruitmentSystem.Migrations
                     b.ToTable("Skills");
                 });
 
+            modelBuilder.Entity("RecruitmentSystem.Models.DocuementModel", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.CandidateModel", "candidate")
+                        .WithMany("Document")
+                        .HasForeignKey("fk_candidate_id");
+
+                    b.HasOne("RecruitmentSystem.Models.EmployeesModel", "employees")
+                        .WithMany("Document")
+                        .HasForeignKey("fk_emp_id");
+
+                    b.Navigation("candidate");
+
+                    b.Navigation("employees");
+                });
+
             modelBuilder.Entity("RecruitmentSystem.Models.EmpRoleMapModel", b =>
                 {
                     b.HasOne("RecruitmentSystem.Models.EmployeesModel", "Employees")
@@ -301,11 +354,15 @@ namespace RecruitmentSystem.Migrations
 
             modelBuilder.Entity("RecruitmentSystem.Models.CandidateModel", b =>
                 {
+                    b.Navigation("Document");
+
                     b.Navigation("Position");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.EmployeesModel", b =>
                 {
+                    b.Navigation("Document");
+
                     b.Navigation("RoleMap");
 
                     b.Navigation("positions");

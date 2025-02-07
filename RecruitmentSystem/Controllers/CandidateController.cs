@@ -59,6 +59,7 @@ public class CandidateController : ControllerBase
     {
         try
         {
+            // data validation is not implemented
             if (file == null || file.Length == 0)
             {
                 throw new Exception("File is empty");
@@ -81,10 +82,11 @@ public class CandidateController : ControllerBase
                 bool is_saved = await candidateService.addCandidate(candidate);
                 if (is_saved)
                 {
-                    Console.WriteLine("Candidate with email "+ candidate.candidate_email + " is saved");
+                    Console.WriteLine("Candidate with email " + candidate.candidate_email + " is saved");
                 }
-                else{
-                    Console.WriteLine("Candidate with email "+ candidate.candidate_email + " is not saved");
+                else
+                {
+                    Console.WriteLine("Candidate with email " + candidate.candidate_email + " is not saved");
                 }
             }
             return Ok(data);
