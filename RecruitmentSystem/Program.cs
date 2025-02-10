@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using RecruitmentSystem.Controllers.Services;
 using RecruitmentSystem.Data;
 using RecruitmentSystem.Helper;
+using RecruitmentSystem.Services.Application;
 using RecruitmentSystem.Services.Candidate;
 using RecruitmentSystem.Services.Document;
 using RecruitmentSystem.Services.Employees;
@@ -51,7 +52,6 @@ builder.Services.AddCors(options =>
 });
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddCors();
 builder.Services.AddOpenApi();
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
@@ -67,9 +67,7 @@ builder.Services.AddScoped<IRoleService, RoleServiceImpl>();
 builder.Services.AddScoped<IRoleMapService, RoleMapServiceImpl>();
 builder.Services.AddScoped<IExcelService, ExcelServiceImpl>();
 builder.Services.AddScoped<IDocumentService, DocumentServiceImpl>();
-
-
-
+builder.Services.AddScoped<IApplicationService, ApplicationServiceImpl>();
 
 
 var app = builder.Build();

@@ -47,4 +47,10 @@ public class PositionModel{
     public CandidateModel? Candidate {get;set;}
 
     public ICollection<PositionSkillMapModel>? PositionSkill {get;} 
+
+    public ICollection<ReviewerPanelModel>? Reviews {get;}
+
+    public ICollection<InterviewPanelModel>? Interviews {get;}
+
+    public ICollection<ApplicationModel>? Applications {get;}
 }

@@ -65,8 +65,8 @@ public class EmployeeServiceImpl : IEmployeeService
     return await _context.Employees.FirstOrDefaultAsync(e => e.pk_emp_id == id);
   }
 
-    public EmployeesModel getEmployeesByIdSync(int id)
-    {
-          return _context.Employees.FirstOrDefault(e => e.pk_emp_id == id);
-    }
+  public EmployeesModel getEmployeesByIdSync(int id)
+  {
+    return _context.Employees.FirstOrDefault(e => e.pk_emp_id == id);
+  }
 }

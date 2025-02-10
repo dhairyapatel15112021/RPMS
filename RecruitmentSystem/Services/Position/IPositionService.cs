@@ -4,13 +4,15 @@ using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.Services.Position;
 
-public interface IPositionService{
+public interface IPositionService
+{
 
     Task<Boolean> createOpening(PositionModel position);
     Task<bool> holdOpening(int positionId, JsonPatchDocument<HoldPostion> holdPosition);
-
-     Task<bool> closeOpening(int positionId, JsonPatchDocument<ClosePostion> closePosition);
-
-     Task<bool> openOpening(int positionId);
-
+    Task<bool> closeOpening(int positionId, JsonPatchDocument<ClosePostion> closePosition);
+    Task<bool> openOpening(int positionId);
+    Task<bool> updateOpening(int positionId, PositionModel position);
+    
+    Task<List<PositionModel>> getAllOpenings();
+    Task<List<PositionModel>> getAllOpenOpenings();
 }

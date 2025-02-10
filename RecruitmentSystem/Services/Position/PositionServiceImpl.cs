@@ -140,4 +140,34 @@ public class PositionServiceImpl : IPositionService
             return false;
         }
     }
+
+    public async Task<bool> updateOpening(int positionId, PositionModel position)
+    {
+        try
+        {
+            PositionModel isPositionExist = await getPosition(positionId);
+            if (isPositionExist == null)
+            {
+                throw new Exception("Position Not Found");
+            }
+            _context.Entry(isPositionExist).CurrentValues.SetValues(position);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return false;
+        }
+    }
+
+    public async Task<List<PositionModel>> getAllOpenings()
+    {
+        return await _context.Position.ToListAsync();
+    }
+
+    public async Task<List<PositionModel>> getAllOpenOpenings()
+    {
+        return await _context.Position.Where(p => p.is_open == PositionStatus.open).ToListAsync();
+    }
 }

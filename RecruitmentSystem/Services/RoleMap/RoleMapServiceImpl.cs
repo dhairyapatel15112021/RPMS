@@ -33,7 +33,8 @@ public class RoleMapServiceImpl : IRoleMapService
     {
         try
         {
-            var roles = from emp_role in _context.RolesMap join role in _context.Roles on emp_role.fk_role_id equals role.pk_role_id where emp_role.fk_emp_id == empId select role.role_type;
+            var roles = from emp_role in _context.RolesMap join role in _context.Roles on emp_role.fk_role_id 
+                        equals role.pk_role_id where emp_role.fk_emp_id == empId select role.role_type;
             return roles.ToList();
         }
         catch (Exception ex)

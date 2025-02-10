@@ -23,7 +23,7 @@ public class DocuementModel{
 
     public DateTime uploaded_at {get;set;} = DateTime.Now;
 
-    public int? fk_candidate_id {get;set;}
+    public int fk_candidate_id {get;set;}
 
     public CandidateModel? candidate {get;set;}
 

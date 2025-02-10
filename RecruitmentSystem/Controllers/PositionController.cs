@@ -109,6 +109,28 @@ public class PositionController : ControllerBase
         }
     }
 
+    [HttpPut("update/{positionId}")]
+    public async Task<ActionResult> updateOpening(int positionId, [FromBody] PositionModel position)
+    {
+        try
+        {
+            if (positionId != position.pk_position_id || position == null)
+            {
+                throw new Exception("Position Should be same or position should not be null");
+            }
+            bool is_updated = await positionService.updateOpening(positionId, position);
+            if (!is_updated)
+            {
+                throw new Exception("No Updated");
+            }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpPost("skill/add")]
     public async Task<ActionResult> addSkillToPosition([FromBody] PositionSkillMapModel positionSkillMapModel)
     {
@@ -125,6 +147,58 @@ public class PositionController : ControllerBase
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("skill/add/{positionId}")]
+    public async Task<ActionResult> removeSkillToPosition(int positionId, [FromQuery] int skillId)
+    {
+        try
+        {
+            if (positionId == 0 || skillId == 0)
+            {
+                throw new Exception("Please Enter Valid Data");
+            }
+            bool is_saved = await positionSkillService.removeSkillToPosition(positionId, skillId);
+            if (is_saved)
+            {
+                return Ok("Removed Succesfully");
+            }
+            throw new Exception("Not Removed");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("get/all")]
+    public async Task<ActionResult<PositionModel>> getAllOpening()
+    {
+        try
+        {
+            List<PositionModel> positions = await positionService.getAllOpenings();
+            return Ok(positions);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return BadRequest();
+        }
+    }
+
+    [HttpGet("get/open")]
+    public async Task<ActionResult<PositionModel>> getAllOpenOpening()
+    {
+        try
+        {
+            List<PositionModel> positions = await positionService.getAllOpenOpenings();
+            return Ok(positions);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return BadRequest();
         }
     }
 

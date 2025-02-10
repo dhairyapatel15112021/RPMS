@@ -32,4 +32,7 @@ public class CandidateModel
     public PositionModel? Position { get; set; }
 
     public ICollection<DocuementModel>? Document { get; }
+
+    public ICollection<ApplicationModel>? Applications {get;}
+    
 }
