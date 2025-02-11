@@ -9,11 +9,18 @@ using RecruitmentSystem.Helper;
 using RecruitmentSystem.Services.Application;
 using RecruitmentSystem.Services.Candidate;
 using RecruitmentSystem.Services.Document;
+using RecruitmentSystem.Services.Email;
 using RecruitmentSystem.Services.Employees;
 using RecruitmentSystem.Services.Excel;
+using RecruitmentSystem.Services.Interview;
+using RecruitmentSystem.Services.InterviewFeedback;
+using RecruitmentSystem.Services.InterviewPanel;
+using RecruitmentSystem.Services.InterviewScheduler;
 using RecruitmentSystem.Services.JWT;
 using RecruitmentSystem.Services.Position;
 using RecruitmentSystem.Services.PositionSkill;
+using RecruitmentSystem.Services.ReviewFeedback;
+using RecruitmentSystem.Services.ReviewPanel;
 using RecruitmentSystem.Services.Role;
 using RecruitmentSystem.Services.RoleMap;
 using RecruitmentSystem.Services.Skills;
@@ -68,7 +75,13 @@ builder.Services.AddScoped<IRoleMapService, RoleMapServiceImpl>();
 builder.Services.AddScoped<IExcelService, ExcelServiceImpl>();
 builder.Services.AddScoped<IDocumentService, DocumentServiceImpl>();
 builder.Services.AddScoped<IApplicationService, ApplicationServiceImpl>();
-
+builder.Services.AddScoped<IInterviewSchedulerService,InterviewSchedulerServiceImpl>();
+builder.Services.AddScoped<IInterviewService,InterviewServiceImpl>();
+builder.Services.AddScoped<IReviewPanelSerivce,ReviewPanelServiceImpl>();
+builder.Services.AddScoped<IInterviewPanelService,InterviewPanelServiceImpl>();
+builder.Services.AddScoped<IInterviewFeedbackService,InterviewFeedbackServiceImpl>();
+builder.Services.AddScoped<IReviewFeebackService,ReviewFeedbackServiceImpl>();
+builder.Services.AddScoped<IEmailService,EmailServiceImpl>();
 
 var app = builder.Build();
 

@@ -86,7 +86,7 @@ namespace RecruitmentSystem.Migrations
                     verified_at = table.Column<DateTime>(type: "datetime2", nullable: true),
                     document_verification_status = table.Column<bool>(type: "bit", nullable: false),
                     uploaded_at = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    fk_candidate_id = table.Column<int>(type: "int", nullable: true),
+                    fk_candidate_id = table.Column<int>(type: "int", nullable: false),
                     fk_emp_id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -166,6 +166,60 @@ namespace RecruitmentSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Applications",
+                columns: table => new
+                {
+                    pk_application_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    comments = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    application_date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    fk_position_id = table.Column<int>(type: "int", nullable: false),
+                    fk_candidate_id = table.Column<int>(type: "int", nullable: false),
+                    applicationStatus = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Applications", x => x.pk_application_id);
+                    table.ForeignKey(
+                        name: "FK_Applications_Candidate_fk_candidate_id",
+                        column: x => x.fk_candidate_id,
+                        principalTable: "Candidate",
+                        principalColumn: "pk_candidate_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Applications_Position_fk_position_id",
+                        column: x => x.fk_position_id,
+                        principalTable: "Position",
+                        principalColumn: "pk_position_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InterviewPanels",
+                columns: table => new
+                {
+                    pk_interview_panel_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    fk_emp_interview_id = table.Column<int>(type: "int", nullable: false),
+                    fk_position_interview_id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InterviewPanels", x => x.pk_interview_panel_id);
+                    table.ForeignKey(
+                        name: "FK_InterviewPanels_Employees_fk_emp_interview_id",
+                        column: x => x.fk_emp_interview_id,
+                        principalTable: "Employees",
+                        principalColumn: "pk_emp_id");
+                    table.ForeignKey(
+                        name: "FK_InterviewPanels_Position_fk_position_interview_id",
+                        column: x => x.fk_position_interview_id,
+                        principalTable: "Position",
+                        principalColumn: "pk_position_id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PositionSkillMap",
                 columns: table => new
                 {
@@ -192,31 +246,63 @@ namespace RecruitmentSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ReviewerPanelModel",
+                name: "ReviewerPanels",
                 columns: table => new
                 {
                     pk_reviwer_panel_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    fk_emp_id = table.Column<int>(type: "int", nullable: false),
-                    fk_position_id = table.Column<int>(type: "int", nullable: false),
-                    review_deadline = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    employeespk_emp_id = table.Column<int>(type: "int", nullable: true),
-                    positionpk_position_id = table.Column<int>(type: "int", nullable: true)
+                    fk_emp_review_id = table.Column<int>(type: "int", nullable: false),
+                    fk_position_review_id = table.Column<int>(type: "int", nullable: false),
+                    review_deadline = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ReviewerPanelModel", x => x.pk_reviwer_panel_id);
+                    table.PrimaryKey("PK_ReviewerPanels", x => x.pk_reviwer_panel_id);
                     table.ForeignKey(
-                        name: "FK_ReviewerPanelModel_Employees_employeespk_emp_id",
-                        column: x => x.employeespk_emp_id,
+                        name: "FK_ReviewerPanels_Employees_fk_emp_review_id",
+                        column: x => x.fk_emp_review_id,
                         principalTable: "Employees",
                         principalColumn: "pk_emp_id");
                     table.ForeignKey(
-                        name: "FK_ReviewerPanelModel_Position_positionpk_position_id",
-                        column: x => x.positionpk_position_id,
+                        name: "FK_ReviewerPanels_Position_fk_position_review_id",
+                        column: x => x.fk_position_review_id,
                         principalTable: "Position",
                         principalColumn: "pk_position_id");
                 });
+
+            migrationBuilder.CreateTable(
+                name: "ReviewFeedbacks",
+                columns: table => new
+                {
+                    pk_review_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    fk_application_id = table.Column<int>(type: "int", nullable: false),
+                    fk_emp_id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReviewFeedbacks", x => x.pk_review_id);
+                    table.ForeignKey(
+                        name: "FK_ReviewFeedbacks_Applications_fk_application_id",
+                        column: x => x.fk_application_id,
+                        principalTable: "Applications",
+                        principalColumn: "pk_application_id");
+                    table.ForeignKey(
+                        name: "FK_ReviewFeedbacks_Employees_fk_emp_id",
+                        column: x => x.fk_emp_id,
+                        principalTable: "Employees",
+                        principalColumn: "pk_emp_id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Applications_fk_candidate_id",
+                table: "Applications",
+                column: "fk_candidate_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Applications_fk_position_id",
+                table: "Applications",
+                column: "fk_position_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Docuements_fk_candidate_id",
@@ -227,6 +313,16 @@ namespace RecruitmentSystem.Migrations
                 name: "IX_Docuements_fk_emp_id",
                 table: "Docuements",
                 column: "fk_emp_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InterviewPanels_fk_emp_interview_id",
+                table: "InterviewPanels",
+                column: "fk_emp_interview_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InterviewPanels_fk_position_interview_id",
+                table: "InterviewPanels",
+                column: "fk_position_interview_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Position_fk_candidate_key",
@@ -251,14 +347,24 @@ namespace RecruitmentSystem.Migrations
                 column: "fk_skills_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReviewerPanelModel_employeespk_emp_id",
-                table: "ReviewerPanelModel",
-                column: "employeespk_emp_id");
+                name: "IX_ReviewerPanels_fk_emp_review_id",
+                table: "ReviewerPanels",
+                column: "fk_emp_review_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReviewerPanelModel_positionpk_position_id",
-                table: "ReviewerPanelModel",
-                column: "positionpk_position_id");
+                name: "IX_ReviewerPanels_fk_position_review_id",
+                table: "ReviewerPanels",
+                column: "fk_position_review_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReviewFeedbacks_fk_application_id",
+                table: "ReviewFeedbacks",
+                column: "fk_application_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReviewFeedbacks_fk_emp_id",
+                table: "ReviewFeedbacks",
+                column: "fk_emp_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RolesMap_fk_emp_id",
@@ -278,10 +384,16 @@ namespace RecruitmentSystem.Migrations
                 name: "Docuements");
 
             migrationBuilder.DropTable(
+                name: "InterviewPanels");
+
+            migrationBuilder.DropTable(
                 name: "PositionSkillMap");
 
             migrationBuilder.DropTable(
-                name: "ReviewerPanelModel");
+                name: "ReviewerPanels");
+
+            migrationBuilder.DropTable(
+                name: "ReviewFeedbacks");
 
             migrationBuilder.DropTable(
                 name: "RolesMap");
@@ -290,10 +402,13 @@ namespace RecruitmentSystem.Migrations
                 name: "Skills");
 
             migrationBuilder.DropTable(
-                name: "Position");
+                name: "Applications");
 
             migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Position");
 
             migrationBuilder.DropTable(
                 name: "Candidate");

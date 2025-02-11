@@ -33,4 +33,8 @@ public class ApplicationModel
     public CandidateModel? candidate { get; set; }
 
     public PositionModel? position { get; set; }
+
+    public ICollection<ReviewFeedbackModel>? ReviewFeedbacks { get; }
+
+    public ICollection<InterviewSchedulerModel>? InterviewSchedulers {get;}
 }

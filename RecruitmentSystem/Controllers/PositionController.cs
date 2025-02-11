@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
+using RecruitmentSystem.Services.InterviewPanel;
 using RecruitmentSystem.Services.Position;
 using RecruitmentSystem.Services.PositionSkill;
+using RecruitmentSystem.Services.ReviewPanel;
 
 namespace RecruitmentSystem.Controllers;
 
@@ -12,13 +14,17 @@ namespace RecruitmentSystem.Controllers;
 [Route("api/position")]
 public class PositionController : ControllerBase
 {
-    private IPositionService positionService;
-    private IPositionSkillService positionSkillService;
+    private readonly IPositionService positionService;
+    private readonly IPositionSkillService positionSkillService;
+    private readonly IReviewPanelSerivce reviewPanelSerivce;
+    private readonly IInterviewPanelService interviewPanelService;
 
-    public PositionController(IPositionService positionService, IPositionSkillService positionSkillService)
+    public PositionController(IPositionService positionService, IPositionSkillService positionSkillService, IReviewPanelSerivce reviewPanelSerivce, IInterviewPanelService interviewPanelService)
     {
         this.positionService = positionService;
         this.positionSkillService = positionSkillService;
+        this.reviewPanelSerivce = reviewPanelSerivce;
+        this.interviewPanelService = interviewPanelService;
     }
 
     [HttpPost("create")]
@@ -202,4 +208,128 @@ public class PositionController : ControllerBase
         }
     }
 
+    [HttpPost("reviewer/add")]
+    public async Task<ActionResult> assignReviewer([FromBody] ReviewerPanelModel reviewerPanel)
+    {
+        try
+        {
+            if (reviewerPanel.fk_emp_review_id == 0 || reviewerPanel.fk_position_review_id == 0 || reviewerPanel.review_deadline.ToString().Trim() == "")
+            {
+                return BadRequest("Please Enter Valid Data");
+            }
+            bool is_assigned = await reviewPanelSerivce.assignReviewer(reviewerPanel);
+            if (!is_assigned)
+            {
+                return BadRequest("Not Saved");
+            }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("reviewer/remove/{reviewId}")]
+    public async Task<ActionResult> removeReviwer(int reviewId)
+    {
+        try
+        {
+            if (reviewId == 0)
+            {
+                return BadRequest("Please Enter Valid Data");
+            }
+            bool is_removed = await reviewPanelSerivce.removeReviewer(reviewId);
+            if (!is_removed)
+            {
+                return BadRequest("Not Removed");
+            }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("reviewer/get")]
+    public async Task<ActionResult<List<ReviewerPanelModel>>> getReviewrPanel([FromQuery] int positionId)
+    {
+        try
+        {
+            if (positionId == 0)
+            {
+                throw new Exception("Please Enter PositionId");
+            }
+            List<ReviewerPanelModel> reviewer = await reviewPanelSerivce.getReviwerByPositionId(positionId);
+            return Ok(reviewer);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return BadRequest(null);
+        }
+    }
+
+    [HttpPost("interviwer/add")]
+    public async Task<ActionResult> assignInterviewer([FromBody] InterviewPanelModel interviewPanel)
+    {
+        try
+        {
+            if (interviewPanel.fk_emp_interview_id == 0 || interviewPanel.fk_position_interview_id == 0)
+            {
+                return BadRequest("Please Enter Valid Data");
+            }
+            bool is_assigned = await interviewPanelService.assignInterviewer(interviewPanel);
+            if (!is_assigned)
+            {
+                return BadRequest("Not Saved");
+            }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("interviwer/remove/{interviwerId}")]
+    public async Task<ActionResult> removeInterviwer(int interviwerId)
+    {
+        try
+        {
+            if (interviwerId == 0)
+            {
+                return BadRequest("Please Enter Valid Data");
+            }
+            bool is_removed = await interviewPanelService.removeInterviwer(interviwerId);
+            if (!is_removed)
+            {
+                return BadRequest("Not Removed");
+            }
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    [HttpGet("interviewer/get")]
+    public async Task<ActionResult<List<InterviewPanelModel>>> getInterviewerPanel([FromQuery] int positionId)
+    {
+        try
+        {
+            if (positionId == 0)
+            {
+                throw new Exception("Please Enter PositionId");
+            }
+            List<InterviewPanelModel> interviwer = await interviewPanelService.getInterviwerByPositionId(positionId);
+            return Ok(interviwer);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return BadRequest(null);
+        }
+    }
 }

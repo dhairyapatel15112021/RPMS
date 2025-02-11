@@ -7,6 +7,8 @@ using RecruitmentSystem.Services.Excel;
 
 namespace RecruitmentSystem.Controllers;
 
+// put,patch method to update candidate profile
+// get method to see particluar candiate profile
 [ApiController]
 [Route("/api/candidate")]
 public class CandidateController : ControllerBase

@@ -38,4 +38,8 @@ public class EmployeesModel{
     public ICollection<ReviewerPanelModel>? Reviews {get;}
 
     public ICollection<InterviewPanelModel>? Interviews {get;}
+
+    public ICollection<ReviewFeedbackModel>? ReviewFeedbacks {get;}
+
+    public ICollection<InterviewFeedbackModel>? InterviewFeedbacks {get;}
 }

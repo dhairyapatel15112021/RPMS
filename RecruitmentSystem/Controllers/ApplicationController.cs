@@ -1,7 +1,11 @@
+using DocumentFormat.OpenXml.Office2021.PowerPoint.Comment;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentSystem.Models;
 using RecruitmentSystem.Services.Application;
+using RecruitmentSystem.Services.Email;
+using RecruitmentSystem.Services.InterviewFeedback;
+using RecruitmentSystem.Services.ReviewFeedback;
 
 namespace RecruitmentSystem.Controllers;
 
@@ -10,10 +14,16 @@ namespace RecruitmentSystem.Controllers;
 public class ApplicationController : ControllerBase
 {
     private readonly IApplicationService applicationService;
+    private readonly IInterviewFeedbackService interviewFeedbackService;
+    private readonly IReviewFeebackService reviewFeebackService;
+    private readonly IEmailService emailService;
 
-    public ApplicationController(IApplicationService applicationService)
+    public ApplicationController(IApplicationService applicationService, IReviewFeebackService reviewFeebackService, IInterviewFeedbackService interviewFeedbackService, IEmailService emailService)
     {
         this.applicationService = applicationService;
+        this.interviewFeedbackService = interviewFeedbackService;
+        this.reviewFeebackService = reviewFeebackService;
+        this.emailService = emailService;
     }
 
     [HttpPost("apply")]
@@ -114,6 +124,11 @@ public class ApplicationController : ControllerBase
             {
                 return BadRequest("No Chnage, Please Try again");
             }
+            bool is_send = await emailService.sendMails(["pateldhairya0210@gmail.com", "parthpatel06072004@gmail.com"], "new email", "<h1>Hello, Your Application Is on hold</h1>");
+            if (is_send)
+            {
+                return Ok("send email");
+            }
             return NoContent();
         }
         catch (Exception ex)
@@ -149,17 +164,40 @@ public class ApplicationController : ControllerBase
     {
         try
         {
-            if(positionId == 0){
+            if (positionId == 0)
+            {
                 return BadRequest("PositionId should not be empty");
             }
             List<ApplicationModel> applications = await applicationService.getAllApplicationByPositionId(positionId);
-            if(applications == null){
+            if (applications == null)
+            {
                 return NoContent();
             }
             return Ok(applications);
         }
         catch (Exception ex)
         {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("review/feedback/add")]
+    public async Task<ActionResult> addReviewFeedback([FromBody] ReviewFeedbackModel reviewFeedback)
+    {
+        try
+        {
+            if (reviewFeedback == null || reviewFeedback.comments.Trim() == "" || reviewFeedback.fk_emp_id == 0 || reviewFeedback.fk_application_id == 0)
+            {
+                BadRequest("Please Enter Valid Data");
+            }
+            string feedback = await reviewFeebackService.addFeedback(reviewFeedback);
+            if (feedback == null)
+                throw new Exception("Something Went Wrong");
+            return Ok(feedback);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("2");
             return BadRequest(ex.Message);
         }
     }

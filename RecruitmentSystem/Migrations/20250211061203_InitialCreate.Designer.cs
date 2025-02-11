@@ -12,7 +12,7 @@ using RecruitmentSystem.Data;
 namespace RecruitmentSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250209154410_InitialCreate")]
+    [Migration("20250211061203_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -24,6 +24,41 @@ namespace RecruitmentSystem.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("RecruitmentSystem.Models.ApplicationModel", b =>
+                {
+                    b.Property<int>("pk_application_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_application_id"));
+
+                    b.Property<int>("applicationStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("application_date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("comments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("fk_candidate_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("fk_position_id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("pk_application_id");
+
+                    b.HasIndex("fk_candidate_id");
+
+                    b.HasIndex("fk_position_id");
+
+                    b.ToTable("Applications");
+                });
 
             modelBuilder.Entity("RecruitmentSystem.Models.CandidateModel", b =>
                 {
@@ -80,7 +115,7 @@ namespace RecruitmentSystem.Migrations
                     b.Property<bool>("document_verification_status")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("fk_candidate_id")
+                    b.Property<int>("fk_candidate_id")
                         .HasColumnType("int");
 
                     b.Property<int?>("fk_emp_id")
@@ -158,6 +193,29 @@ namespace RecruitmentSystem.Migrations
                     b.HasKey("pk_emp_id");
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.InterviewPanelModel", b =>
+                {
+                    b.Property<int>("pk_interview_panel_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_interview_panel_id"));
+
+                    b.Property<int>("fk_emp_interview_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("fk_position_interview_id")
+                        .HasColumnType("int");
+
+                    b.HasKey("pk_interview_panel_id");
+
+                    b.HasIndex("fk_emp_interview_id");
+
+                    b.HasIndex("fk_position_interview_id");
+
+                    b.ToTable("InterviewPanels");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.PositionModel", b =>
@@ -244,6 +302,29 @@ namespace RecruitmentSystem.Migrations
                     b.ToTable("PositionSkillMap");
                 });
 
+            modelBuilder.Entity("RecruitmentSystem.Models.ReviewFeedbackModel", b =>
+                {
+                    b.Property<int>("pk_review_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_review_id"));
+
+                    b.Property<int>("fk_application_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("fk_emp_id")
+                        .HasColumnType("int");
+
+                    b.HasKey("pk_review_id");
+
+                    b.HasIndex("fk_application_id");
+
+                    b.HasIndex("fk_emp_id");
+
+                    b.ToTable("ReviewFeedbacks");
+                });
+
             modelBuilder.Entity("RecruitmentSystem.Models.ReviewerPanelModel", b =>
                 {
                     b.Property<int>("pk_reviwer_panel_id")
@@ -252,16 +333,10 @@ namespace RecruitmentSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_reviwer_panel_id"));
 
-                    b.Property<int?>("employeespk_emp_id")
+                    b.Property<int>("fk_emp_review_id")
                         .HasColumnType("int");
 
-                    b.Property<int>("fk_emp_id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("fk_position_id")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("positionpk_position_id")
+                    b.Property<int>("fk_position_review_id")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("review_deadline")
@@ -269,11 +344,11 @@ namespace RecruitmentSystem.Migrations
 
                     b.HasKey("pk_reviwer_panel_id");
 
-                    b.HasIndex("employeespk_emp_id");
+                    b.HasIndex("fk_emp_review_id");
 
-                    b.HasIndex("positionpk_position_id");
+                    b.HasIndex("fk_position_review_id");
 
-                    b.ToTable("ReviewerPanelModel");
+                    b.ToTable("ReviewerPanels");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.RoleModel", b =>
@@ -317,6 +392,25 @@ namespace RecruitmentSystem.Migrations
                     b.ToTable("Skills");
                 });
 
+            modelBuilder.Entity("RecruitmentSystem.Models.ApplicationModel", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.CandidateModel", "candidate")
+                        .WithMany("Applications")
+                        .HasForeignKey("fk_candidate_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RecruitmentSystem.Models.PositionModel", "position")
+                        .WithMany("Applications")
+                        .HasForeignKey("fk_position_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("candidate");
+
+                    b.Navigation("position");
+                });
+
             modelBuilder.Entity("RecruitmentSystem.Models.DocuementModel", b =>
                 {
                     b.HasOne("RecruitmentSystem.Models.CandidateModel", "candidate")
@@ -349,6 +443,25 @@ namespace RecruitmentSystem.Migrations
                     b.Navigation("Employees");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.InterviewPanelModel", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.EmployeesModel", "employees")
+                        .WithMany("Interviews")
+                        .HasForeignKey("fk_emp_interview_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("RecruitmentSystem.Models.PositionModel", "position")
+                        .WithMany("Interviews")
+                        .HasForeignKey("fk_position_interview_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("employees");
+
+                    b.Navigation("position");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.PositionModel", b =>
@@ -387,23 +500,53 @@ namespace RecruitmentSystem.Migrations
                     b.Navigation("Skills");
                 });
 
+            modelBuilder.Entity("RecruitmentSystem.Models.ReviewFeedbackModel", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.ApplicationModel", "application")
+                        .WithMany("ReviewFeedbacks")
+                        .HasForeignKey("fk_application_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("RecruitmentSystem.Models.EmployeesModel", "Employees")
+                        .WithMany("ReviewFeedbacks")
+                        .HasForeignKey("fk_emp_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Employees");
+
+                    b.Navigation("application");
+                });
+
             modelBuilder.Entity("RecruitmentSystem.Models.ReviewerPanelModel", b =>
                 {
                     b.HasOne("RecruitmentSystem.Models.EmployeesModel", "employees")
                         .WithMany("Reviews")
-                        .HasForeignKey("employeespk_emp_id");
+                        .HasForeignKey("fk_emp_review_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.HasOne("RecruitmentSystem.Models.PositionModel", "position")
                         .WithMany("Reviews")
-                        .HasForeignKey("positionpk_position_id");
+                        .HasForeignKey("fk_position_review_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("employees");
 
                     b.Navigation("position");
                 });
 
+            modelBuilder.Entity("RecruitmentSystem.Models.ApplicationModel", b =>
+                {
+                    b.Navigation("ReviewFeedbacks");
+                });
+
             modelBuilder.Entity("RecruitmentSystem.Models.CandidateModel", b =>
                 {
+                    b.Navigation("Applications");
+
                     b.Navigation("Document");
 
                     b.Navigation("Position");
@@ -412,6 +555,10 @@ namespace RecruitmentSystem.Migrations
             modelBuilder.Entity("RecruitmentSystem.Models.EmployeesModel", b =>
                 {
                     b.Navigation("Document");
+
+                    b.Navigation("Interviews");
+
+                    b.Navigation("ReviewFeedbacks");
 
                     b.Navigation("Reviews");
 
@@ -422,6 +569,10 @@ namespace RecruitmentSystem.Migrations
 
             modelBuilder.Entity("RecruitmentSystem.Models.PositionModel", b =>
                 {
+                    b.Navigation("Applications");
+
+                    b.Navigation("Interviews");
+
                     b.Navigation("PositionSkill");
 
                     b.Navigation("Reviews");

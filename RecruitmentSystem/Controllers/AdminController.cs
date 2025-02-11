@@ -6,6 +6,8 @@ using RecruitmentSystem.Services.RoleMap;
 
 namespace RecruitmentSystem.Controllers;
 
+// remove method for removing roles
+
 [ApiController]
 [Route("api/admin")]
 public class AdminController : ControllerBase

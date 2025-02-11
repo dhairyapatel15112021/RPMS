@@ -5,6 +5,8 @@ using RecruitmentSystem.Services.Employees;
 
 namespace RecruitmentSystem.Controllers;
 
+// put,patch method to update employee profile
+
 [ApiController]
 [Route("/api/employee")]
 public class EmployeeController : ControllerBase
@@ -65,7 +67,7 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpGet("get/{id}")]
-    public async Task<ActionResult<EmployeesModel>> getAllEmployee(int id)
+    public async Task<ActionResult<EmployeesModel>> getEmployee(int id)
     {
         try
         {
