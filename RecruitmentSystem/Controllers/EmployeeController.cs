@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentSystem.Models;
 using RecruitmentSystem.Services.Candidate;
@@ -21,7 +22,7 @@ public class EmployeeController : ControllerBase
         this.candidateService = candidateService;
     }
 
-    [HttpPost]
+    [HttpPost("add")]
     public async Task<ActionResult> addEmployees([FromBody] EmployeesModel employees)
     {
         try
@@ -51,11 +52,11 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpGet("get/all")]
+    [Authorize(Roles ="admin,super_admin")]
     public async Task<ActionResult<List<EmployeesModel>>> getAllEmployees()
     {
         try
         {
-            // changes needed
             List<EmployeesModel> employees = await employeeService.getAllEmployees();
             return Ok(employees);
         }

@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentSystem.Models;
@@ -23,6 +24,7 @@ public class AdminController : ControllerBase
 
     [HttpPost]
     [Route("role/add")]
+    [Authorize(Roles = "admin,super_admin")]
     public async Task<ActionResult> addRoles([FromBody] RoleModel roleModel)
     {
         try
@@ -40,8 +42,25 @@ public class AdminController : ControllerBase
         }
     }
 
+    [HttpDelete("role/remove/{roleId}")]
+    [Authorize(Roles = "admin,super_admin")]
+    public async Task<ActionResult> removeRoles(int roleId){
+        try{
+            bool is_deleted = await roleService.removeRoles(roleId);
+            if(is_deleted){
+               return Ok("Delete Role");
+            }
+           return BadRequest("Something Went Wrong");
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
+    }
+
+
     [HttpPost]
     [Route("role/employee/map/{id}")]
+    [Authorize(Roles = "admin,super_admin")]
     public async Task<ActionResult> mapRoles(int id, [FromBody] int roleId)
     {
         try
@@ -55,9 +74,21 @@ public class AdminController : ControllerBase
         }
     }
 
+    [HttpGet("role/get/all")]
+    [Authorize(Roles = "admin,super_admin")]
+    public async Task<ActionResult> getAllRoles(){
+        try{
+          List<RoleModel> roles = await roleService.getAllRoles();
+          return Ok(roles);
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpGet]
     [Route("role/employee/map/{id}")]
-    [Authorize(Roles ="admin")]
+    [Authorize(Roles ="admin,super_admin")]
     public async Task<ActionResult> getRoles(int id)
     {
         try

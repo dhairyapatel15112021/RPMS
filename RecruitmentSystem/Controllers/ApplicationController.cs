@@ -1,4 +1,5 @@
 using DocumentFormat.OpenXml.Office2021.PowerPoint.Comment;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentSystem.Models;
@@ -27,6 +28,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPost("apply")]
+    [Authorize("candidate")]
     public async Task<ActionResult> apply([FromBody] ApplicationModel application)
     {
         try
@@ -49,6 +51,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpGet("get/{candidateId}")]
+    [Authorize("candidate")]
     public async Task<ActionResult<List<ApplicationModel>>> getAllApplications(int candidateId)
     {
         try
@@ -67,6 +70,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpDelete("remove/{applicationId}")]
+    [Authorize("candidate")]
     public async Task<ActionResult> removeApplication(int applicationId)
     {
         try
@@ -89,6 +93,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPut("update/{applicationId}")]
+    [Authorize("candidate")]
     public async Task<ActionResult> updateApplication(int applicationId, [FromBody] ApplicationModel application)
     {
         try
@@ -111,6 +116,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPut("hold/{applicationId}")]
+    [Authorize("hr,recruiter,admin,super_admin")]
     public async Task<ActionResult> applicationOnHold(int applicationId)
     {
         try
@@ -138,6 +144,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPatch("change/{applicationId}")]
+    [Authorize("interviewer,reviewer")]
     public async Task<ActionResult> changeApplicationField(int applicationId, JsonPatchDocument<ApplicationModel> application)
     {
         try
@@ -160,6 +167,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpGet("position/get/all/{positionId}")]
+    [Authorize("hr,recruiter,admin,super_admin")]
     public async Task<ActionResult<List<ApplicationModel>>> getAllApplicationByPositionId(int positionId)
     {
         try
@@ -182,6 +190,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPost("review/feedback/add")]
+    [Authorize("reviewer")]
     public async Task<ActionResult> addReviewFeedback([FromBody] ReviewFeedbackModel reviewFeedback)
     {
         try

@@ -15,25 +15,17 @@ public class JwtServiceImpl : IJwtService
     {
         this.roleMapService = roleMapService;
     }
-    public async Task<string> generateToken(string email, bool is_candidate, int id, IConfiguration _configuration)
+    public async Task<Dictionary<string,List<string>>> generateToken(string email, bool is_candidate, int id, IConfiguration _configuration)
     {
-        // List<Claim> claims = new List<Claim>() {
-        //                 new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
-        //                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        //                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-        //                 new Claim("email", email),
-        //                 new Claim("is_candidate", is_candidate.ToString()),
-        //                 new Claim("id", id.ToString())
-        //             };
-                List<Claim> claims = new List<Claim>() {
+        Dictionary<string,List<string>> res = new Dictionary<string, List<string>>();
+        List<Claim> claims = new List<Claim>() {
                         new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim("email", email),
                         new Claim("is_candidate", is_candidate.ToString()),
                         new Claim("id", id.ToString())
                     };
-       
-        // get roles of id; 
+
         List<string> roles = await roleMapService.getRoles(id);
         foreach (var role in roles)
         {
@@ -52,7 +44,10 @@ public class JwtServiceImpl : IJwtService
             expires: DateTime.UtcNow.AddMinutes(60),
             signingCredentials: signIn);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        res.Add("token",[new JwtSecurityTokenHandler().WriteToken(token)]);
+        res.Add("roles",roles.Count == 0 ? ["candidate"] : roles);
+
+        return res;
     }
 
 }

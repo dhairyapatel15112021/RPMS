@@ -45,9 +45,10 @@ public class AuthController : ControllerBase
             {
                 throw new Exception("Data is Incorrect");
             }
-            string token = await jwtService.generateToken(login.email, login.is_candidate, id, configuration);
-
-            return Ok(new { token });
+            Dictionary<string, List<string>> res = await jwtService.generateToken(login.email, login.is_candidate, id, configuration);
+            string token = res["token"][0];
+            List<string> roles = res["roles"];
+            return Ok(new { token, roles });
         }
         catch (Exception ex)
         {
