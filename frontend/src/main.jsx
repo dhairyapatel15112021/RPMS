@@ -10,12 +10,20 @@ import { Role } from './pages/Role/Role.jsx'
 import { Employee } from './pages/Employee/Employee.jsx'
 import { AddRole } from './pages/Role/AddRole.jsx'
 import { AssignRole } from './pages/Role/AssignRole.jsx'
+import { Navigation } from './pages/Navigation.jsx'
+import { Recruiter } from './pages/Recruiter/Recruiter.jsx'
+import { Jobs } from './pages/Recruiter/Jobs/Jobs.jsx'
+import { Candidates } from './pages/Recruiter/Candiates/Candidates.jsx'
+import { Position } from './pages/Recruiter/Jobs/Position.jsx'
+import { Skills } from './pages/Recruiter/Jobs/Skills.jsx'
+import { Criteria } from './pages/Recruiter/Jobs/Criteria.jsx'
 
 const router = createBrowserRouter(
   [
     {
       path: "/", element: <App />, children: [
         { path: "login", element: <Login /> },
+        { path: "navigation", element: <Navigation /> },
         {
           path: "admin", element: <ProtectedRoute roles={["admin"]}><Admin /></ProtectedRoute>, children: [
             {
@@ -25,6 +33,18 @@ const router = createBrowserRouter(
               ]
             },
             { path: "employees", element: <ProtectedRoute roles={["admin"]}><Employee /></ProtectedRoute> }
+          ]
+        },
+        {
+          path: "recruiter", element: <ProtectedRoute roles={["recruiter"]}><Recruiter /></ProtectedRoute>, children: [
+            {
+              path: "job", element: <ProtectedRoute roles={["recruiter"]}><Jobs /></ProtectedRoute>, children: [
+                { path: "position", element: <ProtectedRoute roles={["recruiter"]}><Position /></ProtectedRoute> },
+                { path: "skills", element: <ProtectedRoute roles={["recruiter"]}> <Skills/> </ProtectedRoute> },
+                { path: "criteria", element: <ProtectedRoute roles={["recruiter"]}><Criteria /></ProtectedRoute> }
+              ]
+            },
+            { path: "candidates", element: <ProtectedRoute roles={["recruiter"]}><Candidates /></ProtectedRoute> }
           ]
         }
       ]

@@ -1,16 +1,22 @@
 import React, { useState } from 'react'
 import Loader from './Loader';
 import { Unauthorised } from './Unauthorised';
+import { useSelector } from 'react-redux';
 
 export const ProtectedRoute = ({ roles, children }) => {
     const [isLoading, setLoading] = useState(true);
+    const data = useSelector(state => state);
     const [isAuthorised, setAuthorised] = useState(false);
 
     useState(() => {
-        const allowed_roles = JSON.parse(localStorage.getItem("roles"));
 
-        for (let i = 0; i < roles.length && i < allowed_roles.length; i++) {
-            if (allowed_roles[i] == roles[i]) {
+        for (let i = 0; i < roles.length; i++) {
+            if ((roles[i] === "admin" && data?.user?.isAdmin)
+                || (roles[i] === "hr" && data?.user?.isHr)
+                || (roles[i] === "interviewer" && data?.user?.isInterviewer)
+                || (roles[i] === "reviewer" && data?.user?.isReviewer)
+                || (roles[i] === "recruiter" && data?.user?.isRecruiter)
+                || (roles[i] === "admin" && data?.user?.isCandidate)) {
                 setLoading(false);
                 setAuthorised(true);
                 return;

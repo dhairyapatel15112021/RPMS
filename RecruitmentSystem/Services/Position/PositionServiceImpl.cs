@@ -33,10 +33,10 @@ public class PositionServiceImpl : IPositionService
 
     }
 
-    public async Task<List<PositionModel>> getAllPosition()
-    {
-        return await _context.Position.ToListAsync();
-    }
+    // public async Task<List<PositionModel>> getAllPosition()
+    // {
+    //     return await _context.Position.ToListAsync();
+    // }
 
     public async Task<PositionModel> getPosition(int positionId)
     {
@@ -161,9 +161,32 @@ public class PositionServiceImpl : IPositionService
         }
     }
 
-    public async Task<List<PositionModel>> getAllOpenings()
+    public async Task<List<PositionDTO>> getAllOpenings()
     {
-        return await _context.Position.ToListAsync();
+        var allPositions = from position in _context.Position join emp in _context.Employees on position.fk_emp_id equals emp.pk_emp_id join candidate in _context.Candidate on position.fk_candidate_key equals candidate.pk_candidate_id into result from candidate in result.DefaultIfEmpty() select new {emp.emp_name,candidate.candidate_name,position};
+        List<PositionDTO> positions = new List<PositionDTO>();
+
+        foreach(var p in allPositions){
+            
+            PositionDTO dto = new PositionDTO();
+            dto.candidate_name = p.candidate_name;
+            dto.emp_name = p.emp_name;
+            dto.pk_position_id = p.position.pk_position_id;
+            dto.position_title = p.position.position_title;
+            dto.position_description = p.position.position_description;
+            dto.position_min_experience = p.position.position_min_experience;
+            dto.is_open = p.position.is_open;
+            dto.comments = p.position.comments;
+            dto.position_level = p.position.position_level;
+            dto.position_location = p.position.position_location;
+            dto.position_creation_date = p.position.position_creation_date;
+            dto.salary_range = p.position.salary_range;
+            dto.qualification = p.position.qualification;
+
+            positions.Add(dto);
+        }
+       
+        return positions;
     }
 
     public async Task<List<PositionModel>> getAllOpenOpenings()

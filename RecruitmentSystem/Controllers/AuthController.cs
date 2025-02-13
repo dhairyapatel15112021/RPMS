@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
             Dictionary<string, List<string>> res = await jwtService.generateToken(login.email, login.is_candidate, id, configuration);
             string token = res["token"][0];
             List<string> roles = res["roles"];
-            return Ok(new { token, roles });
+            return Ok(new { token, roles , id });
         }
         catch (Exception ex)
         {

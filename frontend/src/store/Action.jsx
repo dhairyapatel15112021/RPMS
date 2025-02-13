@@ -1,5 +1,6 @@
-export const login = () => {
+export const login = (payload) => {
     return {
-        type : 'login'
+        type : 'login',
+        payload
     }
 }

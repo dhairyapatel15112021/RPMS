@@ -13,6 +13,7 @@ public interface IPositionService
     Task<bool> openOpening(int positionId);
     Task<bool> updateOpening(int positionId, PositionModel position);
     
-    Task<List<PositionModel>> getAllOpenings();
+    Task<List<PositionDTO>> getAllOpenings();
     Task<List<PositionModel>> getAllOpenOpenings();
+    Task<PositionModel> getPosition(int positionId);
 }

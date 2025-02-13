@@ -3,11 +3,14 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Toast } from '../component/Toast/Toast';
 import { ApiEndPoints } from '../data/ApiEndPoints';
+import { useDispatch } from 'react-redux';
+import { login } from '../store/Action';
 
 const Login = () => {
     const navigate = useNavigate();
     const [loginData, setLoginData] = useState({ email: "", password: "", is_candidate: false });
     const [Error, setError] = useState("");
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -34,13 +37,52 @@ const Login = () => {
         try {
             const response = await axios.post(ApiEndPoints.login, loginData);
             const roles = response.data.roles;
-            roles.sort();
             localStorage.setItem("token", `Bearer ${response.data.token}`);
-            localStorage.setItem("roles", JSON.stringify(roles));
-            navigate("/admin/roles/add");
+            const data = {
+                id: response.data.id, isCandidate: false,
+                isAdmin: false,
+                isInterviewer: false,
+                isReviewer: false,
+                isRecruiter: false,
+                isHr: false
+            };
+            for (let i = 0; i < roles.length; i++) {
+                switch(roles[i]){
+                    case "admin" : 
+                        data.isAdmin = true;
+                        data.isCandidate = true;
+                        data.isHr = true;
+                        data.isReviewer = true;
+                        data.isInterviewer = true;
+                        data.isRecruiter = true;
+                        break;
+                    
+                    case "hr":
+                        data.isHr = true;
+                        break;
+                    
+                    case "interviewer":
+                        data.isInterviewer = true;
+                        break;
+
+                    case "reviewer":
+                        data.isReviewer = true;
+                        break;
+                    
+                    case "recruiter":
+                        data.isRecruiter = true;
+                        break;
+
+                    case "candidate":
+                        data.isCandidate = true;
+                        break;
+                }
+            }
+            dispatch(login(data));
+            navigate("/navigation");
         }
         catch (err) {
-            setError(err.response.data || err.message);
+            setError( err.message || err.response.data);
             console.log(err);
         }
     }

@@ -1,4 +1,5 @@
 using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentSystem.dto;
@@ -179,11 +180,12 @@ public class PositionController : ControllerBase
     }
 
     [HttpGet("get/all")]
-    public async Task<ActionResult<PositionModel>> getAllOpening()
+    [Authorize(Roles ="admin,recruiter")]
+    public async Task<ActionResult<PositionDTO>> getAllOpening()
     {
         try
         {
-            List<PositionModel> positions = await positionService.getAllOpenings();
+            List<PositionDTO> positions = await positionService.getAllOpenings();
             return Ok(positions);
         }
         catch (Exception e)
