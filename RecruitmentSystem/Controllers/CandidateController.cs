@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentSystem.Models;
 using RecruitmentSystem.Services.Candidate;
@@ -28,6 +29,7 @@ public class CandidateController : ControllerBase
     }
 
     [HttpPost("add")]
+    [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult> addCandidate([FromBody] CandidateModel candidate)
     {
         try
@@ -57,11 +59,11 @@ public class CandidateController : ControllerBase
     }
 
     [HttpPost("add/all")]
+    [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult> addAllCandidate(IFormFile file)
     {
         try
         {
-            // data validation is not implemented
             if (file == null || file.Length == 0)
             {
                 throw new Exception("File is empty");
@@ -96,6 +98,21 @@ public class CandidateController : ControllerBase
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("get/all")]
+    [Authorize(Roles = "admin,recruiter")]
+    public async Task<ActionResult<List<CandidateModel>>> getAllCandidates()
+    {
+        try
+        {
+            List<CandidateModel> candidates = await candidateService.getAllCandidates();
+            return Ok(candidates);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(null);
         }
     }
 }

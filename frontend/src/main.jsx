@@ -17,6 +17,8 @@ import { Candidates } from './pages/Recruiter/Candiates/Candidates.jsx'
 import { Position } from './pages/Recruiter/Jobs/Position.jsx'
 import { Skills } from './pages/Recruiter/Jobs/Skills.jsx'
 import { Criteria } from './pages/Recruiter/Jobs/Criteria.jsx'
+import { CandidateSection } from './pages/Recruiter/Candiates/CandidateSection.jsx'
+import { Application } from './pages/Recruiter/Candiates/Application.jsx'
 
 const router = createBrowserRouter(
   [
@@ -44,7 +46,10 @@ const router = createBrowserRouter(
                 { path: "criteria", element: <ProtectedRoute roles={["recruiter"]}><Criteria /></ProtectedRoute> }
               ]
             },
-            { path: "candidates", element: <ProtectedRoute roles={["recruiter"]}><Candidates /></ProtectedRoute> }
+            { path: "candidates", element: <ProtectedRoute roles={["recruiter"]}><Candidates /></ProtectedRoute> , children : [
+              {path : "manage",element : <ProtectedRoute roles={["recruiter"]}> <CandidateSection/> </ProtectedRoute>},
+              {path : "application",element : <ProtectedRoute roles={["recruiter"]}><Application/></ProtectedRoute>}
+            ]}
           ]
         }
       ]

@@ -9,19 +9,22 @@ import { Modal } from '../../../component/Modal';
 import { useSelector } from 'react-redux';
 import { ClickSVG } from '../../../component/Recruiter/ClickSVG';
 
-// validation while positin creatin
+// validation while positin creation,updation,hold,close,reopen
 // error messages whith toast
-// hold
-// close
-// update
-// reopen 
+// positin status wise button color
+// close -> isclose state is created
+// search
+// pagination
 
 export const Position = () => {
   const data = useSelector(state => state);
   const [positionData, setPositionData] = useState({ "position_title": "", "position_description": "", "position_min_experience": "", "position_level": "", "position_location": "", "position_creation_date": new Date(), "salary_range": "", "qualification": "", "fk_emp_id": data.user.id });
-
+  const [patchPositionData, setPatchPositionData] = useState({ comments: "", fk_candidate_id: 0 });
   const [position, setPositions] = useState([]);
   const [isLoading, setLoading] = useState(true);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [isClose, setIsClose] = useState(false);
+  const [positionId, setPositionId] = useState(0);
 
   const columns = ["PositionId", "Title", "Description", , "Level", "Location", "Qualification", "CreatedAt", "CreatedBy", "Salary Range", "Status", "Experience Rquired", "Selected Candiate", "Comments", ""];
   const positionStatus = ["open", "hold", "close"];
@@ -33,14 +36,26 @@ export const Position = () => {
   { type: "text", name: "salary_range", placeholder: "Salary Range" },
   { type: "text", name: "qualification", placeholder: "Qualification" }
   ];
+  const holdPositionInputs = [{ type: "text", name: "comments", placeholder: "Comments" }];
+  const closePositionInputs = [{ type: "text", name: "comments", placeholder: "Comments" },
+  { type: "text", name: "fk_candidate_id", placeholder: "Candidate" }];
+
   const modalId = "position_modal";
+  const modalUpdateId = "position_update_id";
+
+  const patchOnChange = (event) => {
+    setPatchPositionData({ ...patchPositionData, [event.target.name]: event.target.value });
+  }
+
+  const onChangeFunction = (event) => {
+    setPositionData({ ...positionData, [event.target.name]: event.target.value });
+  }
 
   const getAllPositions = async () => {
     try {
       setLoading(true);
       const response = await axios.get(ApiEndPoints.getAllPositions, { headers: { Authorization: localStorage.getItem("token") } });
       setPositions(response.data);
-      // setPositionData({"position_title": "","position_description": "","position_min_experience": "","position_level": "","position_location": "","position_creation_date": new Date(),"salary_range": "","qualification": "","fk_emp_id" :data.user.id });
     }
     catch (err) {
       console.log(err.message || err.response.data);
@@ -50,17 +65,44 @@ export const Position = () => {
     }
   }
 
-  const onChangeFunction = (event) => {
-    setPositionData({ ...positionData, [event.target.name]: event.target.value });
+  const reopenPosition = async (position) => {
+    try {
+      const response = await axios.put(`${ApiEndPoints.reopenPosition}${position.pk_position_id}`, null, { headers: { Authorization: localStorage.getItem("token") } });
+      console.log(response.data);
+      getAllPositions();
+    }
+    catch (err) {
+      console.log(err || err.message || err.response.data);
+    }
+  }
+
+  const onPatchSubmitFunction = async () => {
+    try {
+      let patchData = [{ "path": "comments", "op": "replace", "value": patchPositionData.comments }];
+      if (isClose) {
+        patchData.push({ "path": "fk_candidate_id", "op": "replace", "value": patchPositionData.fk_candidate_id });
+      }
+      const response = await axios.patch(`${ApiEndPoints.holdPosition}${positionId}`, patchData, { headers: { Authorization: localStorage.getItem("token") } });
+      console.log(response.data);
+      getAllPositions();
+    }
+    catch (err) {
+      console.log(err || err.message || err.response.data);
+    }
   }
 
   const onSubmitFunction = async () => {
     try {
-      const response = await axios.post(ApiEndPoints.createPosition, positionData, { headers: { Authorization: localStorage.getItem("token") } });
+      let { candidate_name, emp_name, ...updatePositiondata } = positionData;
+      const response = isUpdate ? await axios.put(`${ApiEndPoints.updatePosition}${updatePositiondata.pk_position_id}`, { ...updatePositiondata, "fk_emp_id": data.user.id }, { headers: { Authorization: localStorage.getItem("token") } }) : await axios.post(ApiEndPoints.createPosition, positionData, { headers: { Authorization: localStorage.getItem("token") } });
+      setPositionData({ "position_title": "", "position_description": "", "position_min_experience": "", "position_level": "", "position_location": "", "position_creation_date": new Date(), "salary_range": "", "qualification": "", "fk_emp_id": data.user.id });
       getAllPositions();
     }
     catch (err) {
-      console.log(err.message || err.response.data);
+      console.log(err || err.message || err.response.data);
+    }
+    finally {
+      if (isUpdate) { setIsUpdate(false) };
     }
   }
 
@@ -68,9 +110,21 @@ export const Position = () => {
     getAllPositions();
   }, []);
 
+  const setUpdateSettings = (position) => {
+    setPositionData(() => position);
+    setIsUpdate(() => true);
+    document.getElementById(modalId).showModal();
+  }
+
+  const setPatchSettings = (position) => {
+    document.getElementById(modalUpdateId).showModal();
+    setPositionId(() => position.pk_position_id);
+  }
+
   return (
     <div className='p-2 shadow-md mt-3 rounded-md w-full overflow-hidden'>
-      <Modal onchange={onChangeFunction} onsubmit={onSubmitFunction} id={modalId} inputs={inputs} title={"Create New Position"} />
+      <Modal onchange={onChangeFunction} onsubmit={onSubmitFunction} data={positionData} id={modalId} inputs={inputs} title={isUpdate ? "Update Position" : "Create New Position"} />
+      <Modal onsubmit={onPatchSubmitFunction} onchange={patchOnChange} id={modalUpdateId} inputs={holdPositionInputs} title={isClose ? "Close Position" : "Hold Position"} />
       <div className='w-full flex justify-between items-center'>
         <div><SearchInput /></div>
         <div className='flex justify-between items-center gap-2 bg-violet-100 text-blue-500 p-2 rounded-md cursor-pointer' onClick={() => document.getElementById(modalId).showModal()}>
@@ -101,12 +155,12 @@ export const Position = () => {
                     <td>{item.comments || "No Comments"}</td>
                     <td>
                       <details className="dropdown dropdown-left relative">
-                        <summary className="btn p-0 h-fit"><ClickSVG/></summary>
+                        <summary className="btn p-0 h-fit"><ClickSVG /></summary>
                         <ul className="menu dropdown-content bg-base-100 rounded-box absolute z-1 w-fit p-2 shadow-sm">
-                          <li><div>Hold</div></li>
-                          <li><div>Close</div></li>
-                          <li><div>Update</div></li>
-                          <li><div>Reopen</div></li>
+                          <li><div onClick={() => setPatchSettings(item)}>Hold</div></li>
+                          <li><div onClick={() => setPatchSettings(item)}>Close</div></li>
+                          <li><div onClick={() => setUpdateSettings(item)}>Update</div></li>
+                          <li><div onClick={() => reopenPosition(item)}>Reopen</div></li>
                         </ul>
                       </details>
                     </td>

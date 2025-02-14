@@ -33,10 +33,6 @@ public class PositionServiceImpl : IPositionService
 
     }
 
-    // public async Task<List<PositionModel>> getAllPosition()
-    // {
-    //     return await _context.Position.ToListAsync();
-    // }
 
     public async Task<PositionModel> getPosition(int positionId)
     {
@@ -101,7 +97,8 @@ public class PositionServiceImpl : IPositionService
             holdPosition.ApplyTo(patchDocument);
 
             position.is_open = PositionStatus.hold;
-            if (patchDocument.comments != null && patchDocument.comments.Trim() == null)
+            Console.WriteLine(patchDocument.comments);
+            if (patchDocument.comments != null && patchDocument.comments.Trim() != "")
                 position.comments = patchDocument.comments;
             else
                 throw new Exception("Comments is Compalusary");
@@ -129,7 +126,6 @@ public class PositionServiceImpl : IPositionService
             {
                 throw new Exception("Position is already open");
             }
-
             position.is_open = PositionStatus.open;
             await _context.SaveChangesAsync();
             return true;

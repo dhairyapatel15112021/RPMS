@@ -12,4 +12,5 @@ public interface ICandidateService
     Task<int> checkCandidateCredentials(string name, string password);
 
     Task<bool> addCandidate(CandidateModel candidate);
+    Task<List<CandidateModel>> getAllCandidates();
 }

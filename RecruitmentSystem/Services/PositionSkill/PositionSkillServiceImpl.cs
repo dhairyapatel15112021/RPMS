@@ -66,4 +66,14 @@ public class PositionSkillServiceImpl : IPositionSkillService
             return false;
         }
     }
+
+    public void getAllPositionSkills()
+    {
+        try{
+            //  i think we need stored + curosr combination for this.
+        }
+        catch(Exception ex){
+            Console.WriteLine("error in positionskillmap");
+        }
+    }
 }

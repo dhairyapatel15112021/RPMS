@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentSystem.Models;
 using RecruitmentSystem.Services.Skills;
@@ -17,6 +18,7 @@ public class SkillsController : ControllerBase
     }
 
     [HttpPost("add")]
+    [Authorize(Roles ="recruiter,admin")]
     public async Task<ActionResult> addSkills([FromBody] SkillsModel skills)
     {
         try
@@ -38,7 +40,20 @@ public class SkillsController : ControllerBase
         }
     }
 
+    [HttpGet("get/all")]
+    [Authorize(Roles ="recruiter,admin")]
+    public async Task<ActionResult<List<SkillsModel>>> getAllSkills(){
+        try{
+            List<SkillsModel> skills = await skillsService.getAllSkills();
+            return Ok(skills);
+        }
+        catch(Exception ex){
+            return BadRequest(null);
+        }
+    }
+
     [HttpPut("update/{id}")]
+    [Authorize(Roles ="recruiter,admin")]
     public async Task<ActionResult> updateSkills(int id, [FromBody] SkillsModel skills)
     {
         try

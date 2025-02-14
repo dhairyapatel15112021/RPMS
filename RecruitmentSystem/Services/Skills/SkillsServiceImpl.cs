@@ -29,6 +29,11 @@ public class SkillsServiceImpl : ISkillsService
         }
     }
 
+    public async Task<List<SkillsModel>> getAllSkills()
+    {
+        return await _context.Skills.ToListAsync();
+    }
+
     public async Task<bool> updateSkill(int id, SkillsModel skills)
     {
         try

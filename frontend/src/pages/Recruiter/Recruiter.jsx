@@ -10,7 +10,7 @@ export const Recruiter = () => {
   return (
     <div className='flex gap-2 w-screen h-[90vh]'>
       <Sidebar type="Recruiter">
-        <SidebarItem text="Jobs" icon={<Job />} to="/recruiter/job/position" />
+        <SidebarItem text="Jobs" icon={<Job />} to="/recruiter/job" />
         <SidebarItem text="Candidates" icon={<Candidate />} to="/recruiter/candidates" />
       </Sidebar>
       <div className='mt-3'>

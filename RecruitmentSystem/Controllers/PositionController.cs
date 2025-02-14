@@ -48,6 +48,7 @@ public class PositionController : ControllerBase
     }
 
     [HttpPatch("hold/{positionId}")]
+    [Authorize(Roles ="admin,recruiter")]
     public async Task<ActionResult> holdOpening(int positionId, [FromBody] JsonPatchDocument<HoldPostion> holdPosition)
     {
         try
@@ -72,6 +73,7 @@ public class PositionController : ControllerBase
 
 
     [HttpPatch("close/{positionId}")]
+    [Authorize(Roles ="admin,recruiter")]
     public async Task<ActionResult> closeOpening(int positionId, [FromBody] JsonPatchDocument<ClosePostion> closePosition)
     {
         try
@@ -95,6 +97,7 @@ public class PositionController : ControllerBase
     }
 
     [HttpPut("open/{positionId}")]
+    [Authorize(Roles ="admin,recruiter")]
     public async Task<ActionResult> openOpening(int positionId)
     {
         try
@@ -157,7 +160,18 @@ public class PositionController : ControllerBase
         }
     }
 
-    [HttpDelete("skill/add/{positionId}")]
+    [HttpGet("skill/get/all")]
+    public async Task<ActionResult> getAllPositionSkills(){
+        try{
+            positionSkillService.getAllPositionSkills();
+            return Ok();
+        }
+        catch(Exception ex){
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpDelete("skill/remove/{positionId}")]
     public async Task<ActionResult> removeSkillToPosition(int positionId, [FromQuery] int skillId)
     {
         try

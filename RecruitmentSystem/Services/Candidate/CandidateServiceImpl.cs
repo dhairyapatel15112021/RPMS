@@ -46,6 +46,12 @@ public class CandidateServiceImpl : ICandidateService
             return -1;
         }
     }
+
+    public async Task<List<CandidateModel>> getAllCandidates()
+    {
+       return await _context.Candidate.ToListAsync();
+    }
+
     public async Task<CandidateModel> getCandidateByEmail(string email)
     {
         return await _context.Candidate.FirstOrDefaultAsync(c => c.candidate_email == email);
