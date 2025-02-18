@@ -91,7 +91,7 @@ export const Position = () => {
       console.log(err || err.message || err.response.data);
     }
     finally {
-      if(isClose)
+      if (isClose)
         setIsClose(false);
     }
   }
@@ -169,10 +169,12 @@ export const Position = () => {
                       <details className="dropdown dropdown-left relative">
                         <summary className="btn p-0 h-fit"><ClickSVG /></summary>
                         <ul className="menu dropdown-content bg-base-100 rounded-box absolute z-1 w-fit p-2 shadow-sm">
-                          <li><div onClick={() => setPatchSettings(item)}>Hold</div></li>
+                          {
+                            item.is_open == 1 ? <li><div onClick={() => reopenPosition(item)}>Reopen</div></li> : <li><div onClick={() => setPatchSettings(item)}>Hold</div></li>
+                          }
                           <li><div onClick={() => setClosePositionSettings(item)}>Close</div></li>
                           <li><div onClick={() => setUpdateSettings(item)}>Update</div></li>
-                          <li><div onClick={() => reopenPosition(item)}>Reopen</div></li>
+
                         </ul>
                       </details>
                     </td>

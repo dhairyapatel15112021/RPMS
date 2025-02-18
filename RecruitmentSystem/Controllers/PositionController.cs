@@ -261,6 +261,24 @@ public class PositionController : ControllerBase
         }
     }
 
+    [HttpGet("get/reviewe/{employeeId}")]
+    public async Task<ActionResult> getPositionByReviewer(int employeeId)
+    {
+        try
+        {
+            List<PositionDTO> positions = reviewPanelSerivce.getPositionByEmployeeId(employeeId);
+            if (positions == null)
+            {
+                Console.WriteLine("Something Went Wrong");
+            }
+            return Ok(positions);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
     [HttpGet("reviewer/get")]
     [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult<List<EmployeeReviewerdto>>> getReviewrPanel([FromQuery] int positionId)

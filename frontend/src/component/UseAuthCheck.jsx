@@ -55,11 +55,6 @@ export const UseAuthCheck = ({setIsChecked}) => {
                         break;
                 }
                 dispatch(login(data));
-                // if (response.data.is_candidate) {
-                //     navigate("/");
-                //     return;
-                // }
-                // navigate("/navigation");
             }
         }
         catch (err) {

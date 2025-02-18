@@ -143,11 +143,27 @@ public class ApplicationServiceImpl : IApplicationService
         }
     }
 
-    public async Task<List<ApplicationModel>> getAllApplicationByPositionId(int positionId)
+    public async Task<List<Applicationdto>> getAllApplicationByPositionId(int id, int positionId)
     {
         try
         {
-            List<ApplicationModel> applications = await _context.Applications.Where(a => a.fk_position_id == positionId).ToListAsync();
+            List<ApplicationStatus> ids = [ApplicationStatus.applied, ApplicationStatus.completed, ApplicationStatus.interview, ApplicationStatus.on_hold, ApplicationStatus.review];
+            List<ApplicationStatus> reviewIds = [ApplicationStatus.review];
+            List<ApplicationStatus> interviewIds = [ApplicationStatus.interview];
+
+            var result = from application in _context.Applications join can in _context.Candidate on application.fk_candidate_id equals can.pk_candidate_id where application.fk_position_id == positionId && (id == 1 ? ids.Contains(application.applicationStatus) : reviewIds.Contains(application.applicationStatus)) select new { application, can.candidate_name, can.candidate_email, can.cv_path };
+
+            List<Applicationdto> applications = new List<Applicationdto>();
+            foreach (var app in result)
+            {
+                Applicationdto application = new Applicationdto();
+                application.application = app.application;
+                application.candidate_email = app.candidate_email;
+                application.candidate_name = app.candidate_name;
+                application.cv_path = app.cv_path;
+
+                applications.Add(application);
+            }
             return applications;
         }
         catch (Exception ex)
@@ -162,8 +178,8 @@ public class ApplicationServiceImpl : IApplicationService
         try
         {
             List<ApplicationPositiondto> applications = new List<ApplicationPositiondto>();
-           var query = @"select * from Candidate where pk_candidate_id not in (select fk_candidate_id from Applications where fk_position_id = {0})";
-           var result = await _context.Candidate.FromSqlRaw(query,positionId).ToListAsync();
+            var query = @"select * from Candidate where pk_candidate_id not in (select fk_candidate_id from Applications where fk_position_id = {0})";
+            var result = await _context.Candidate.FromSqlRaw(query, positionId).ToListAsync();
             foreach (var r in result)
             {
                 ApplicationPositiondto app = new ApplicationPositiondto();

@@ -29,8 +29,8 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPost("apply/{positionId}")]
-    [Authorize(Roles ="admin,recruiter")]
-    public async Task<ActionResult> apply([FromBody] List<int> ids,int positionId)
+    [Authorize(Roles = "admin,recruiter")]
+    public async Task<ActionResult> apply([FromBody] List<int> ids, int positionId)
     {
         try
         {
@@ -38,7 +38,7 @@ public class ApplicationController : ControllerBase
             {
                 throw new Exception("Please Enter Proper Data");
             }
-            bool is_applied = await applicationService.applyApplication(ids,positionId);
+            bool is_applied = await applicationService.applyApplication(ids, positionId);
             if (!is_applied)
             {
                 return BadRequest("Application Failed");
@@ -117,7 +117,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPut("hold/{applicationId}")]
-    [Authorize("hr,recruiter,admin")]
+    [Authorize(Roles = "hr,recruiter,admin")]
     public async Task<ActionResult> applicationOnHold(int applicationId)
     {
         try
@@ -145,7 +145,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPatch("change/{applicationId}")]
-    [Authorize("interviewer,reviewer")]
+    [Authorize(Roles = "Reviewer,admin")]
     public async Task<ActionResult> changeApplicationField(int applicationId, JsonPatchDocument<ApplicationModel> application)
     {
         try
@@ -168,16 +168,20 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpGet("position/get/all/{positionId}")]
-    [Authorize(Roles = "recruiter,admin")]
-    public async Task<ActionResult<List<ApplicationModel>>> getAllApplicationByPositionId(int positionId)
+    [Authorize(Roles = "recruiter,admin,Reviewer,Interviewer")]
+    public async Task<ActionResult<List<Applicationdto>>> getAllApplicationByPositionId([FromQuery] int id, int positionId)
     {
+        // here 1 means recruiter or admin
+        // here 2 reviewer
+        // here 3 interviewewr
+        // here 4 hr
         try
         {
             if (positionId == 0)
             {
                 return BadRequest("PositionId should not be empty");
             }
-            List<ApplicationModel> applications = await applicationService.getAllApplicationByPositionId(positionId);
+            List<Applicationdto> applications = await applicationService.getAllApplicationByPositionId(id, positionId);
             if (applications == null)
             {
                 return NoContent();
@@ -191,7 +195,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPost("review/feedback/add")]
-    [Authorize("reviewer")]
+    [Authorize(Roles = "Reviewer,admin")]
     public async Task<ActionResult> addReviewFeedback([FromBody] ReviewFeedbackModel reviewFeedback)
     {
         try
@@ -218,7 +222,6 @@ public class ApplicationController : ControllerBase
     {
         try
         {
-            // get all candidates who have not applied for position.
             List<ApplicationPositiondto> candidates = await applicationService.getAllByCandidateNotAppliedPosition(positionId);
             return Ok(candidates);
         }
@@ -227,4 +230,20 @@ public class ApplicationController : ControllerBase
             return BadRequest();
         }
     }
+
+    [HttpGet("get/review/{employeeId}")]
+    [Authorize(Roles = "Reviewer,admin")]
+    public async Task<ActionResult> getRevieweOfApplication([FromQuery] int applicationId, int employeeId)
+    {
+        try
+        {
+            ReviewFeedbackModel reviewe = await reviewFeebackService.getFeedback(applicationId, employeeId);
+            return Ok(reviewe.comments);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
 }

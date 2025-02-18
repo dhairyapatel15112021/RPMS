@@ -131,16 +131,13 @@ public class CandidateController : ControllerBase
             {
                 return BadRequest("No File Uploaded");
             }
-            Console.WriteLine("HI -2 ");
 
             var fileName = Path.GetFileNameWithoutExtension(cv.FileName) + "_" + candidateId + Path.GetExtension(cv.FileName);
             var filePath = Path.Combine(folderPath, fileName);
-            Console.WriteLine("HI -2 ");
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await cv.CopyToAsync(stream);
             }
-            Console.WriteLine("HI -2 ");
             await candidateService.storeCvPathToDatabase($"/Resumes/{fileName}", candidateId);
             return Ok("Uploaded Sucessfully");
         }

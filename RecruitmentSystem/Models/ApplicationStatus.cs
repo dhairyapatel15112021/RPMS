@@ -1,7 +1,6 @@
 namespace RecruitmentSystem.Models;
 
-public enum ApplicationStatus
-{
+public enum ApplicationStatus{
     applied,
     review,
     interview,

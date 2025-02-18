@@ -45,6 +45,9 @@ namespace RecruitmentSystem.Data
             modelBuilder.Entity<CandidateInterviewModel>().HasKey(m => m.pk_interview_id);
             modelBuilder.Entity<InterviewFeedbackModel>().HasKey(m => m.pk_interview_feedback_id);
 
+            // trigger
+            modelBuilder.Entity<ApplicationModel>().ToTable(tb => tb.HasTrigger("application_status"));
+
             // Registering Relationship
 
             // relationship for which employee create position

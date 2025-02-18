@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RecruitmentSystem.Data;
+using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.Services.ReviewPanel;
@@ -35,6 +36,41 @@ public class ReviewPanelServiceImpl : IReviewPanelSerivce
             await transaction.RollbackAsync();
             Console.WriteLine(ex.Message);
             return false;
+        }
+    }
+
+    public List<PositionDTO> getPositionByEmployeeId(int employeeId)
+    {
+        try
+        {
+            var allPositions = from reviewe in _context.ReviewerPanels join pos in _context.Position on reviewe.fk_position_review_id equals pos.pk_position_id where reviewe.fk_emp_review_id == employeeId select new { pos };
+            List<PositionDTO> positions = new List<PositionDTO>();
+
+            foreach (var p in allPositions)
+            {
+                PositionDTO dto = new PositionDTO();
+                dto.candidate_name = null;
+                dto.emp_name = null;
+                dto.pk_position_id = p.pos.pk_position_id;
+                dto.position_title = p.pos.position_title;
+                dto.position_description = p.pos.position_description;
+                dto.position_min_experience = p.pos.position_min_experience;
+                dto.is_open = p.pos.is_open;
+                dto.comments = p.pos.comments;
+                dto.position_level = p.pos.position_level;
+                dto.position_location = p.pos.position_location;
+                dto.position_creation_date = p.pos.position_creation_date;
+                dto.salary_range = p.pos.salary_range;
+                dto.qualification = p.pos.qualification;
+
+                positions.Add(dto);
+            }
+
+            return positions;
+        }
+        catch (Exception ex)
+        {
+            return null;
         }
     }
 

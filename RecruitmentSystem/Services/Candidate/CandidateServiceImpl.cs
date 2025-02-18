@@ -71,6 +71,7 @@ public class CandidateServiceImpl : ICandidateService
 
     public async Task<bool> storeCvPathToDatabase(string filePath, int candidateId)
     {
+        var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
             CandidateModel candidate = await getCandidateById(candidateId);
@@ -79,11 +80,15 @@ public class CandidateServiceImpl : ICandidateService
                 throw new Exception("Invalid Id");
             }
             candidate.cv_path = filePath;
+
+            await _context.Applications.Where(app => app.fk_candidate_id == candidateId).ExecuteUpdateAsync(id => id.SetProperty(a => a.applicationStatus , ApplicationStatus.review));
             await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
             return true;
         }
         catch (Exception ex)
         {
+            await transaction.RollbackAsync();
             Console.WriteLine(ex.Message);
             return false;
         }

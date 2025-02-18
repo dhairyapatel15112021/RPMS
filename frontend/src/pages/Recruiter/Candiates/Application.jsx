@@ -6,6 +6,7 @@ import { ApiEndPoints } from '../../../data/ApiEndPoints';
 import { Table } from '../../../component/Table';
 import { ClickSVG } from '../../../component/Recruiter/ClickSVG';
 import { Apply } from './Apply';
+import { ApplicationCandidateModal } from './ApplicationCandidateModal';
 
 export const Application = () => {
   const [isLoading, setLoading] = useState(true);
@@ -13,6 +14,7 @@ export const Application = () => {
   const columns = ["PositionId", "Title", "Description", "Experience", "Position Level", ""];
   const [positionId, setPositionId] = useState(0);
   const applyModalId = "apply_modal_id";
+  const applicationModalId = "application_modal_id";
 
   const getOpenPositions = async () => {
     try {
@@ -36,9 +38,15 @@ export const Application = () => {
     document.getElementById(applyModalId).showModal();
   }
 
+  const setApplicationSettings = (id) => {
+    setPositionId(() => id);
+    document.getElementById(applicationModalId).showModal();
+  }
+
   return (
     <div className='p-2 shadow-md mt-3 rounded-md w-full overflow-hidden'>
       <Apply positionId={positionId} id={applyModalId} setPositionId={setPositionId} />
+      <ApplicationCandidateModal id={applicationModalId} positionId={positionId} />
       <div className='w-full flex justify-between items-center'>
         <div><SearchInput /></div>
       </div>
@@ -60,7 +68,7 @@ export const Application = () => {
                         <summary className="btn p-0 h-fit"><ClickSVG /></summary>
                         <ul className="menu dropdown-content bg-base-100 rounded-box absolute z-1 w-fit p-2 shadow-sm">
                           <li><div onClick={() => setApplicationApplySetting(item.pk_position_id)}>Apply</div></li>
-                          <li><div>Applications</div></li>
+                          <li><div onClick={() => setApplicationSettings(item.pk_position_id)}>Applications</div></li>
                         </ul>
                       </details>
                     </td>

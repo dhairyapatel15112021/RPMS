@@ -74,6 +74,7 @@ export const CandidateSection = () => {
                 console.log("Please Select Valid Files");
                 return;
             }
+            console.log(id);
             const data = new FormData();
             data.append("cv", file);
 
@@ -129,7 +130,7 @@ export const CandidateSection = () => {
                         {
                             candidates.map((item, index) => {
                                 return (
-                                    <tr key={index} className='text-center'>
+                                    <tr key={item.pk_candidate_id} className='text-center'>
                                         <td>{item.pk_candidate_id}</td>
                                         <td>{item.candidate_name}</td>
                                         <td>{item.candidate_email}</td>
@@ -140,18 +141,12 @@ export const CandidateSection = () => {
                                         <td><button className='btn'>Education</button></td>
                                         <td>{
                                             item.cv_path ?
-                                                <Link to={`http://localhost:5083${item.cv_path}`} target='_blank' className='flex justify-between items-center gap-2 w-fit bg-violet-100 text-blue-500 p-2 rounded-md cursor-pointer'>
+                                                <Link to={`http://localhost:5083${item.cv_path}`} target='_blank' className='flex justify-between items-center gap-2 w-fit bg-violet-100 text-blue-500 p-2 rounded-md cursor-pointer justify-self-center'>
                                                     <div><Document /></div>
                                                     <div>View</div>
                                                 </Link>
                                                 :
-                                                <div>
-                                                    <label for='upload-cv' className='flex justify-between items-center gap-2 bg-violet-100 text-blue-500 p-2 rounded-md cursor-pointer'>
-                                                        <div><Document /></div>
-                                                        <div>Upload</div>
-                                                    </label>
-                                                    <input onChange={(event) => onCvChange(event, item.pk_candidate_id)} id='upload-cv' type="file" accept='.pdf,.docx,.doc' className="file-input hidden" />
-                                                </div>
+                                                <input onChange={(event) => onCvChange(event, item.pk_candidate_id)} id='upload-cv' type="file" className="file-input file-input-ghost file-input-xs w-fit" />
                                         }
                                         </td>
                                         <td>

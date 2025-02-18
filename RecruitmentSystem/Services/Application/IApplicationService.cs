@@ -8,7 +8,7 @@ public interface IApplicationService
 {
     Task<ApplicationModel> getApplication(int candidateId, int positionId);
 
-    Task<bool> applyApplication(List<int> ids,int positionId);
+    Task<bool> applyApplication(List<int> ids, int positionId);
 
     Task<List<ApplicationModel>> getAllApplicationOfCandidate(int candidateId);
 
@@ -21,7 +21,7 @@ public interface IApplicationService
     Task<ApplicationModel> getApplicationById(int applicationId);
     Task<bool> changeApplication(int applicationId, JsonPatchDocument<ApplicationModel> application);
 
-    // get all applicatin for particluar position
-    Task<List<ApplicationModel>> getAllApplicationByPositionId(int positionId);
+    // get all application for particluar position
+    Task<List<Applicationdto>> getAllApplicationByPositionId(int id, int positionId);
     Task<List<ApplicationPositiondto>> getAllByCandidateNotAppliedPosition(int positionId);
 }
