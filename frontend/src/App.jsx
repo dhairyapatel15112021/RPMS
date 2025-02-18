@@ -4,14 +4,21 @@ import './App.css';
 import Header from './component/Header';
 import store from './store/Store';
 import { Provider } from 'react-redux';
+import { UseAuthCheck } from './component/UseAuthCheck';
+import { useEffect, useState } from 'react';
 
 function App() {
-
+  const [isChecked, setIsChecked] = useState(false);
   return (
-
     <Provider store={store}>
-      <Header />
-      <Outlet />
+      <UseAuthCheck setIsChecked={setIsChecked} />
+      {
+        isChecked &&
+        <>
+          <Header />
+          <Outlet />
+        </>
+      }
     </Provider>
   )
 }

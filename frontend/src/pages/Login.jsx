@@ -22,6 +22,10 @@ const Login = () => {
     }, []);
 
     const onChangeFunction = (event) => {
+        if (event.target.type === "checkbox") {
+            setLoginData({ ...loginData, [event.target.name]: event.target.checked });
+            return;
+        }
         setLoginData({ ...loginData, [event.target.name]: event.target.value });
     }
 
@@ -39,36 +43,37 @@ const Login = () => {
             const roles = response.data.roles;
             localStorage.setItem("token", `Bearer ${response.data.token}`);
             const data = {
-                id: response.data.id, isCandidate: false,
+                id: response.data.id,
+                isCandidate: false,
                 isAdmin: false,
                 isInterviewer: false,
                 isReviewer: false,
                 isRecruiter: false,
-                isHr: false
+                isHr: false,
+                isLogin: true
             };
             for (let i = 0; i < roles.length; i++) {
-                switch(roles[i]){
-                    case "admin" : 
+                switch (roles[i]) {
+                    case "admin":
                         data.isAdmin = true;
-                        data.isCandidate = true;
                         data.isHr = true;
                         data.isReviewer = true;
                         data.isInterviewer = true;
                         data.isRecruiter = true;
                         break;
-                    
+
                     case "hr":
                         data.isHr = true;
                         break;
-                    
-                    case "interviewer":
+
+                    case "Interviewer":
                         data.isInterviewer = true;
                         break;
 
-                    case "reviewer":
+                    case "Reviewer":
                         data.isReviewer = true;
                         break;
-                    
+
                     case "recruiter":
                         data.isRecruiter = true;
                         break;
@@ -79,10 +84,14 @@ const Login = () => {
                 }
             }
             dispatch(login(data));
+            if (loginData.is_candidate) {
+                navigate("/");
+                return;
+            }
             navigate("/navigation");
         }
         catch (err) {
-            setError( err.message || err.response.data);
+            setError(err.message || err.response.data);
             console.log(err);
         }
     }
@@ -95,7 +104,15 @@ const Login = () => {
                 <div className='flex flex-col mt-5 gap-5'>
                     <input onChange={onChangeFunction} type="text" name="email" placeholder="Email" className='border rounded-sm p-2 focus:outline-none' />
                     <input onChange={onChangeFunction} type="password" name="password" placeholder='Password' className='border rounded-sm p-2 focus:outline-none' />
-                    <button onClick={submitForm} type="button" className='bg-blue-700 w-fit py-1 px-2 text-white rounded-sm hover:bg-white hover:text-blue-700 hover:cursor-pointer self-end'>SUBMIT</button>
+                    <div className='flex justify-between items-center w-full'>
+                        <div>
+                            <label className="label text-xs font-medium">
+                                <input type="checkbox" onChange={onChangeFunction} name='is_candidate' className="checkbox checkbox-sm" />
+                                Candidate?
+                            </label>
+                        </div>
+                        <button onClick={submitForm} type="button" className='bg-blue-700 w-fit py-1 px-2 text-white rounded-sm hover:bg-white hover:text-blue-700 hover:cursor-pointer'>SUBMIT</button>
+                    </div>
                 </div>
             </div>
         </div>

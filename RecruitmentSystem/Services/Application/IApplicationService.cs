@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.JsonPatch;
+using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.Services.Application;
@@ -7,7 +8,7 @@ public interface IApplicationService
 {
     Task<ApplicationModel> getApplication(int candidateId, int positionId);
 
-    Task<bool> applyApplication(ApplicationModel application);
+    Task<bool> applyApplication(List<int> ids,int positionId);
 
     Task<List<ApplicationModel>> getAllApplicationOfCandidate(int candidateId);
 
@@ -22,4 +23,5 @@ public interface IApplicationService
 
     // get all applicatin for particluar position
     Task<List<ApplicationModel>> getAllApplicationByPositionId(int positionId);
+    Task<List<ApplicationPositiondto>> getAllByCandidateNotAppliedPosition(int positionId);
 }

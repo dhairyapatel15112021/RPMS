@@ -4,7 +4,6 @@ namespace RecruitmentSystem.dto;
 
 public class PositionDTO{
 
-
     public int pk_position_id {get;set;}
     public String position_title {get;set;}
     public String position_description {get;set;}

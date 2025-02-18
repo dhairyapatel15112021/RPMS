@@ -12,7 +12,7 @@ using RecruitmentSystem.Data;
 namespace RecruitmentSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250211142618_UpdateSchema")]
+    [Migration("20250217151620_UpdateSchema")]
     partial class UpdateSchema
     {
         /// <inheritdoc />
@@ -112,6 +112,9 @@ namespace RecruitmentSystem.Migrations
 
                     b.Property<string>("candidate_password")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("cv_path")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("role")
@@ -384,6 +387,9 @@ namespace RecruitmentSystem.Migrations
                     b.Property<int>("fk_skills_id")
                         .HasColumnType("int");
 
+                    b.Property<bool>("is_min_req_skills")
+                        .HasColumnType("bit");
+
                     b.HasKey("pk_position_skill_id");
 
                     b.HasIndex("fk_position_id");
@@ -470,9 +476,6 @@ namespace RecruitmentSystem.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_skills_id"));
-
-                    b.Property<bool>("is_min_req_skills")
-                        .HasColumnType("bit");
 
                     b.Property<string>("skills_description")
                         .IsRequired()

@@ -1,16 +1,18 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { ApiEndPoints } from '../../data/ApiEndPoints';
-import { ModelRole } from './ModelRole';
-import { DeleteSVG } from '../../component/DeleteSVG.JSX';
-import { Toast } from '../../component/Toast/Toast';
-import { ToastSucess } from '../../component/Toast/ToastSucess';
+import { ApiEndPoints } from '../../../data/ApiEndPoints';
+import { DeleteSVG } from '../../../component/DeleteSVG';
+import { Toast } from '../../../component/Toast/Toast';
+import { ToastSucess } from '../../../component/Toast/ToastSucess';
+import { Modal } from '../../../component/Modal';
 
 export const AddRole = () => {
     const [roles, setRoles] = useState([]);
     const [roleData, setRoleData] = useState({ role_type: "" });
     const [Error, setError] = useState("");
     const [Sucess, setSucess] = useState("");
+    const modalID = "role_modal";
+    const inputs = [{type : "text" , placeholder : "Role Type" , name : "role_type"}];
 
     const onChangeFunction = (event) => {
         setRoleData({ ...roleData, [event.target.name]: event.target.value });
@@ -71,10 +73,10 @@ export const AddRole = () => {
     }, []);
 
     return (
-        <div className='p-2'>
+        <div className='p-2 mt-3 w-fit'>
             {Error && <Toast message={Error} />}
             {Sucess && <ToastSucess message={Sucess} />}
-            <ModelRole onchange={onChangeFunction} onsubmit={onSubmitFunction} />
+            <Modal title="New Role" onchange={onChangeFunction} onsubmit={onSubmitFunction} id={modalID} inputs={inputs}  />
             <div className='font-bold text-lg'>
                 Below Are Listed Roles
             </div>
@@ -100,7 +102,7 @@ export const AddRole = () => {
                             })
                         }
                         <tr>
-                            <td colSpan={3} className='font-bold cursor-pointer' onClick={() => document.getElementById('role_modal').showModal()}>+ add new roles</td>
+                            <td colSpan={3} className='font-bold cursor-pointer' onClick={() => document.getElementById(modalID).showModal()}>+ add new roles</td>
                         </tr>
                     </tbody>
                 </table>

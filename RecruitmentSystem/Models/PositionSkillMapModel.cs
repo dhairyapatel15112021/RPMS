@@ -15,6 +15,9 @@ public class PositionSkillMapModel{
     [Required]
     public int fk_skills_id {get;set;}
 
+    [Required]
+    public Boolean is_min_req_skills {get;set;}
+
     public PositionModel? Position {get;set;}
 
     public SkillsModel? Skills {get;set;}

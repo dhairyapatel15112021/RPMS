@@ -5,7 +5,7 @@ import { Percentage } from '../../../component/Percentage';
 import { MiniSidebar } from '../../../component/MiniSidebar';
 
 export const Jobs = () => {
-    const SidebarItem = [{ icon: <Percentage />, text: "Position", to: "/recruiter/job/position" }, { icon: <Percentage />, text: "Skills", to: "/recruiter/job/skills" }, { icon: <Percentage />, text: "Criteria", to: "/recruiter/job/criteria" }];
+    const SidebarItem = [{ icon: <Percentage />, text: "Position", to: "/recruiter/job/position" }, { icon: <Percentage />, text: "Skills", to: "/recruiter/job/skills" }, { icon: <Percentage />, text: "Manage", to: "/recruiter/job/criteria" }];
    
     return (
         <div className='w-[88vw] h-fit flex gap-2'>

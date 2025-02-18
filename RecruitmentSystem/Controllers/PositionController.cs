@@ -48,7 +48,7 @@ public class PositionController : ControllerBase
     }
 
     [HttpPatch("hold/{positionId}")]
-    [Authorize(Roles ="admin,recruiter")]
+    [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult> holdOpening(int positionId, [FromBody] JsonPatchDocument<HoldPostion> holdPosition)
     {
         try
@@ -73,7 +73,7 @@ public class PositionController : ControllerBase
 
 
     [HttpPatch("close/{positionId}")]
-    [Authorize(Roles ="admin,recruiter")]
+    [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult> closeOpening(int positionId, [FromBody] JsonPatchDocument<ClosePostion> closePosition)
     {
         try
@@ -97,7 +97,7 @@ public class PositionController : ControllerBase
     }
 
     [HttpPut("open/{positionId}")]
-    [Authorize(Roles ="admin,recruiter")]
+    [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult> openOpening(int positionId)
     {
         try
@@ -120,6 +120,7 @@ public class PositionController : ControllerBase
     }
 
     [HttpPut("update/{positionId}")]
+    [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult> updateOpening(int positionId, [FromBody] PositionModel position)
     {
         try
@@ -142,12 +143,13 @@ public class PositionController : ControllerBase
     }
 
     [HttpPost("skill/add")]
-    public async Task<ActionResult> addSkillToPosition([FromBody] PositionSkillMapModel positionSkillMapModel)
+    [Authorize(Roles = "admin,recruiter")]
+    public async Task<ActionResult> addSkillToPosition([FromBody] PositionSkilldto positionSkilldto)
     {
         try
         {
             // validation left
-            bool is_saved = await positionSkillService.addSkillToPosition(positionSkillMapModel);
+            bool is_saved = await positionSkillService.addSkillToPosition(positionSkilldto);
             if (is_saved)
             {
                 return Ok("Added");
@@ -160,32 +162,18 @@ public class PositionController : ControllerBase
         }
     }
 
-    [HttpGet("skill/get/all")]
-    public async Task<ActionResult> getAllPositionSkills(){
-        try{
-            positionSkillService.getAllPositionSkills();
-            return Ok();
-        }
-        catch(Exception ex){
-            return BadRequest(ex.Message);
-        }
-    }
-
-    [HttpDelete("skill/remove/{positionId}")]
-    public async Task<ActionResult> removeSkillToPosition(int positionId, [FromQuery] int skillId)
+    [HttpGet("skill/get/all/{positionId}")]
+    [Authorize(Roles = "admin,recruiter")]
+    public async Task<ActionResult<List<Skilldto>>> getAllPositionSkills(int positionId)
     {
         try
         {
-            if (positionId == 0 || skillId == 0)
+            List<Skilldto> mappedSkills = await positionSkillService.getAllPositionSkills(positionId);
+            if (mappedSkills == null)
             {
-                throw new Exception("Please Enter Valid Data");
+                throw new Exception("Something went wrong");
             }
-            bool is_saved = await positionSkillService.removeSkillToPosition(positionId, skillId);
-            if (is_saved)
-            {
-                return Ok("Removed Succesfully");
-            }
-            throw new Exception("Not Removed");
+            return Ok(mappedSkills);
         }
         catch (Exception ex)
         {
@@ -194,7 +182,7 @@ public class PositionController : ControllerBase
     }
 
     [HttpGet("get/all")]
-    [Authorize(Roles ="admin,recruiter")]
+    [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult<PositionDTO>> getAllOpening()
     {
         try
@@ -210,11 +198,15 @@ public class PositionController : ControllerBase
     }
 
     [HttpGet("get/open")]
-    public async Task<ActionResult<PositionModel>> getAllOpenOpening()
+    public async Task<ActionResult<PositionDTO>> getAllOpenOpening()
     {
         try
         {
-            List<PositionModel> positions = await positionService.getAllOpenOpenings();
+            List<PositionDTO> positions = await positionService.getAllOpenOpenings();
+            if (positions == null)
+            {
+                throw new Exception("Something Went Wrong");
+            }
             return Ok(positions);
         }
         catch (Exception e)
@@ -224,16 +216,17 @@ public class PositionController : ControllerBase
         }
     }
 
-    [HttpPost("reviewer/add")]
-    public async Task<ActionResult> assignReviewer([FromBody] ReviewerPanelModel reviewerPanel)
+    [HttpPost("reviewer/add/{positionId}")]
+    [Authorize(Roles = "admin,recruiter")]
+    public async Task<ActionResult> assignReviewer([FromBody] List<int> ids, int positionId)
     {
         try
         {
-            if (reviewerPanel.fk_emp_review_id == 0 || reviewerPanel.fk_position_review_id == 0 || reviewerPanel.review_deadline.ToString().Trim() == "")
+            if (ids == null)
             {
-                return BadRequest("Please Enter Valid Data");
+                throw new Exception("Please Give Data");
             }
-            bool is_assigned = await reviewPanelSerivce.assignReviewer(reviewerPanel);
+            bool is_assigned = await reviewPanelSerivce.assignReviewer(ids, positionId);
             if (!is_assigned)
             {
                 return BadRequest("Not Saved");
@@ -269,7 +262,8 @@ public class PositionController : ControllerBase
     }
 
     [HttpGet("reviewer/get")]
-    public async Task<ActionResult<List<ReviewerPanelModel>>> getReviewrPanel([FromQuery] int positionId)
+    [Authorize(Roles = "admin,recruiter")]
+    public async Task<ActionResult<List<EmployeeReviewerdto>>> getReviewrPanel([FromQuery] int positionId)
     {
         try
         {
@@ -277,7 +271,7 @@ public class PositionController : ControllerBase
             {
                 throw new Exception("Please Enter PositionId");
             }
-            List<ReviewerPanelModel> reviewer = await reviewPanelSerivce.getReviwerByPositionId(positionId);
+            List<EmployeeReviewerdto> reviewer = await reviewPanelSerivce.getReviwerByPositionId(positionId);
             return Ok(reviewer);
         }
         catch (Exception ex)
@@ -287,16 +281,16 @@ public class PositionController : ControllerBase
         }
     }
 
-    [HttpPost("interviwer/add")]
-    public async Task<ActionResult> assignInterviewer([FromBody] InterviewPanelModel interviewPanel)
+    [HttpPost("interviwer/add/{positionId}")]
+    public async Task<ActionResult> assignInterviewer([FromBody] List<int> ids, int positionId)
     {
         try
         {
-            if (interviewPanel.fk_emp_interview_id == 0 || interviewPanel.fk_position_interview_id == 0)
+            if (ids == null)
             {
                 return BadRequest("Please Enter Valid Data");
             }
-            bool is_assigned = await interviewPanelService.assignInterviewer(interviewPanel);
+            bool is_assigned = await interviewPanelService.assignInterviewer(ids, positionId);
             if (!is_assigned)
             {
                 return BadRequest("Not Saved");
@@ -331,7 +325,7 @@ public class PositionController : ControllerBase
         }
     }
     [HttpGet("interviewer/get")]
-    public async Task<ActionResult<List<InterviewPanelModel>>> getInterviewerPanel([FromQuery] int positionId)
+    public async Task<ActionResult<List<EmployeeReviewerdto>>> getInterviewerPanel([FromQuery] int positionId)
     {
         try
         {
@@ -339,7 +333,7 @@ public class PositionController : ControllerBase
             {
                 throw new Exception("Please Enter PositionId");
             }
-            List<InterviewPanelModel> interviwer = await interviewPanelService.getInterviwerByPositionId(positionId);
+            List<EmployeeReviewerdto> interviwer = await interviewPanelService.getInterviwerByPositionId(positionId);
             return Ok(interviwer);
         }
         catch (Exception ex)

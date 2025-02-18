@@ -126,6 +126,10 @@ public class PositionServiceImpl : IPositionService
             {
                 throw new Exception("Position is already open");
             }
+            if (position.is_open == PositionStatus.close && position.fk_candidate_key != null)
+            {
+                throw new Exception("Position Is Closed and Candidate Is Already Selected");
+            }
             position.is_open = PositionStatus.open;
             await _context.SaveChangesAsync();
             return true;
@@ -159,11 +163,11 @@ public class PositionServiceImpl : IPositionService
 
     public async Task<List<PositionDTO>> getAllOpenings()
     {
-        var allPositions = from position in _context.Position join emp in _context.Employees on position.fk_emp_id equals emp.pk_emp_id join candidate in _context.Candidate on position.fk_candidate_key equals candidate.pk_candidate_id into result from candidate in result.DefaultIfEmpty() select new {emp.emp_name,candidate.candidate_name,position};
+        var allPositions = from position in _context.Position join emp in _context.Employees on position.fk_emp_id equals emp.pk_emp_id join candidate in _context.Candidate on position.fk_candidate_key equals candidate.pk_candidate_id into result from candidate in result.DefaultIfEmpty() select new { emp.emp_name, candidate.candidate_name, position };
         List<PositionDTO> positions = new List<PositionDTO>();
 
-        foreach(var p in allPositions){
-            
+        foreach (var p in allPositions)
+        {
             PositionDTO dto = new PositionDTO();
             dto.candidate_name = p.candidate_name;
             dto.emp_name = p.emp_name;
@@ -181,12 +185,43 @@ public class PositionServiceImpl : IPositionService
 
             positions.Add(dto);
         }
-       
+
         return positions;
     }
 
-    public async Task<List<PositionModel>> getAllOpenOpenings()
+    public async Task<List<PositionDTO>> getAllOpenOpenings()
     {
-        return await _context.Position.Where(p => p.is_open == PositionStatus.open).ToListAsync();
+        try
+        {
+            var result = await _context.Position.Where(p => p.is_open == PositionStatus.open).ToListAsync();
+            List<PositionDTO> positions = new List<PositionDTO>();
+
+            foreach (var r in result)
+            {
+                PositionDTO dto = new PositionDTO();
+                dto.candidate_name = null;
+                dto.emp_name = null;
+                dto.pk_position_id = r.pk_position_id;
+                dto.position_title = r.position_title;
+                dto.position_description = r.position_description;
+                dto.position_min_experience =  r.position_min_experience;
+                dto.is_open = r.is_open;
+                dto.comments = r.comments;
+                dto.position_level = r.position_level;
+                dto.position_location = r.position_location;
+                dto.position_creation_date = r.position_creation_date;
+                dto.salary_range = r.salary_range;
+                dto.qualification = r.qualification;
+
+                positions.Add(dto);
+            }
+
+            return positions;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return null;
+        }
     }
 }

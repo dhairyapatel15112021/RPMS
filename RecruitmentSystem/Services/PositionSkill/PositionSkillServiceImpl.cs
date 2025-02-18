@@ -1,6 +1,6 @@
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using RecruitmentSystem.Data;
+using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.Services.PositionSkill;
@@ -15,65 +15,74 @@ public class PositionSkillServiceImpl : IPositionSkillService
         _context = context;
     }
 
-    public async Task<PositionSkillMapModel> getSkillPositionByPositionIdAndSkillId(int positionId, int skillId)
+
+    public async Task<bool> addSkillToPosition(PositionSkilldto positionSkilldto)
     {
+        var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            return await _context.PositionSkillMap.FirstOrDefaultAsync(p => p.fk_position_id == positionId && p.fk_skills_id == skillId);
+            var allIds = positionSkilldto.minimumSkill.Concat(positionSkilldto.preferedSkill);
+
+            var existingSkills = await _context.PositionSkillMap.Where(s => allIds.Contains(s.fk_skills_id) && s.fk_position_id == positionSkilldto.positionId).ToListAsync();
+
+            var existingIds = existingSkills.Select(s => s.fk_skills_id);
+
+            foreach (var skill in existingSkills)
+            {
+                bool is_exist = positionSkilldto.minimumSkill.Contains(skill.fk_skills_id);
+                if (is_exist)
+                {
+                    skill.is_min_req_skills = true;
+                }
+                else if (positionSkilldto.preferedSkill.Contains(skill.fk_skills_id))
+                {
+                    skill.is_min_req_skills = false;
+                }
+            }
+
+            var newMinSkills = positionSkilldto.minimumSkill.Where(id => !existingIds.Contains(id)).Select(id => new PositionSkillMapModel { fk_position_id = positionSkilldto.positionId, fk_skills_id = id, is_min_req_skills = true });
+            var preferedSkills = positionSkilldto.preferedSkill.Where(id => !existingIds.Contains(id)).Select(id => new PositionSkillMapModel { fk_position_id = positionSkilldto.positionId, fk_skills_id = id, is_min_req_skills = false });
+
+            await _context.PositionSkillMap.AddRangeAsync(newMinSkills);
+            await _context.PositionSkillMap.AddRangeAsync(preferedSkills);
+
+            await _context.PositionSkillMap.Where(s => !allIds.Contains(s.fk_skills_id) && s.fk_position_id == positionSkilldto.positionId).ExecuteDeleteAsync();
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return true;
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex.Message);
+            await transaction.RollbackAsync();
+            return false;
+        }
+    }
+
+
+    public async Task<List<Skilldto>> getAllPositionSkills(int positionId)
+    {
+        try
+        {
+            var result = from position in _context.Position join positionSkill in _context.PositionSkillMap on position.pk_position_id equals positionSkill.fk_position_id join skill in _context.Skills on positionSkill.fk_skills_id equals skill.pk_skills_id where position.pk_position_id == positionId select new { positionSkill,skill };
+            List<Skilldto> positionSkills = new List<Skilldto>();
+            foreach (var r in result)
+            {
+                Skilldto dto = new Skilldto();
+                dto.pk_skills_id = r.skill.pk_skills_id;
+                dto.skills_name = r.skill.skills_name;
+                dto.skills_description = r.skill.skills_description;
+                dto.is_min_req_skills = r.positionSkill.is_min_req_skills;
+                positionSkills.Add(dto);
+            }
+            return positionSkills;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
             return null;
-        }
-    }
-
-    public async Task<bool> addSkillToPosition(PositionSkillMapModel positionSkill)
-    {
-        try
-        {
-            var isAlreadyExist = await getSkillPositionByPositionIdAndSkillId(positionSkill.fk_position_id, positionSkill.fk_skills_id);
-            if (isAlreadyExist != null)
-            {
-                throw new Exception("Skill Is Already Mapped to the position");
-            }
-            await _context.PositionSkillMap.AddAsync(positionSkill);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return false;
-        }
-    }
-
-    public async Task<bool> removeSkillToPosition(int positionId, int skillId)
-    {
-        try
-        {
-            var isAlreadyExist = await getSkillPositionByPositionIdAndSkillId(positionId, skillId);
-            if (isAlreadyExist == null)
-            {
-                throw new Exception("Position and Skill Is not mapped");
-            }
-            await _context.PositionSkillMap.Where(p => p.pk_position_skill_id == isAlreadyExist.pk_position_skill_id).ExecuteDeleteAsync();
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return false;
-        }
-    }
-
-    public void getAllPositionSkills()
-    {
-        try{
-            //  i think we need stored + curosr combination for this.
-        }
-        catch(Exception ex){
-            Console.WriteLine("error in positionskillmap");
         }
     }
 }

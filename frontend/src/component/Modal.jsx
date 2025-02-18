@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const Modal = ({ onchange, data, onsubmit, oncheckboxchange, id, title, inputs }) => {
+export const Modal = ({ onchange, data, onsubmit, id, title, inputs }) => {
     return (
         <dialog id={id} className="modal">
             <div className="modal-box pt-0">
@@ -10,11 +10,6 @@ export const Modal = ({ onchange, data, onsubmit, oncheckboxchange, id, title, i
                         {
                             inputs.map((input, index) => {
                                 return (
-                                    input.type === "checkbox" ? 
-                                    <label className="fieldset-label text-base mb-2">
-                                        <input type="checkbox" checked={data["is_min_req_skills"]} name='is_min_req_skills' className="checkbox checkbox-sm" onChange={oncheckboxchange} />
-                                        {input.placeholder}
-                                    </label> : 
                                     <input type={input.type} className="input mb-2" placeholder={data?.[input.name] || input.placeholder} name={input.name} onChange={onchange} />
                                 )
                             })

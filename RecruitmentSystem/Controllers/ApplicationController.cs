@@ -2,6 +2,7 @@ using DocumentFormat.OpenXml.Office2021.PowerPoint.Comment;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 using RecruitmentSystem.Services.Application;
 using RecruitmentSystem.Services.Email;
@@ -27,17 +28,17 @@ public class ApplicationController : ControllerBase
         this.emailService = emailService;
     }
 
-    [HttpPost("apply")]
-    [Authorize("candidate")]
-    public async Task<ActionResult> apply([FromBody] ApplicationModel application)
+    [HttpPost("apply/{positionId}")]
+    [Authorize(Roles ="admin,recruiter")]
+    public async Task<ActionResult> apply([FromBody] List<int> ids,int positionId)
     {
         try
         {
-            if (application == null || application.fk_candidate_id == 0 || application.fk_position_id == 0)
+            if (ids == null || ids.Count == 0)
             {
-                return BadRequest("Please Enter Valid Data");
+                throw new Exception("Please Enter Proper Data");
             }
-            bool is_applied = await applicationService.applyApplication(application);
+            bool is_applied = await applicationService.applyApplication(ids,positionId);
             if (!is_applied)
             {
                 return BadRequest("Application Failed");
@@ -50,8 +51,8 @@ public class ApplicationController : ControllerBase
         }
     }
 
-    [HttpGet("get/{candidateId}")]
-    [Authorize("candidate")]
+    [HttpGet("candidate/get/all/{candidateId}")]
+    [Authorize(Roles = "recruiter,admin,candidate")]
     public async Task<ActionResult<List<ApplicationModel>>> getAllApplications(int candidateId)
     {
         try
@@ -70,7 +71,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpDelete("remove/{applicationId}")]
-    [Authorize("candidate")]
+    [Authorize("recruiter,admin")]
     public async Task<ActionResult> removeApplication(int applicationId)
     {
         try
@@ -93,7 +94,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPut("update/{applicationId}")]
-    [Authorize("candidate")]
+    [Authorize("admin,recruiter")]
     public async Task<ActionResult> updateApplication(int applicationId, [FromBody] ApplicationModel application)
     {
         try
@@ -116,7 +117,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPut("hold/{applicationId}")]
-    [Authorize("hr,recruiter,admin,super_admin")]
+    [Authorize("hr,recruiter,admin")]
     public async Task<ActionResult> applicationOnHold(int applicationId)
     {
         try
@@ -167,7 +168,7 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpGet("position/get/all/{positionId}")]
-    [Authorize("hr,recruiter,admin,super_admin")]
+    [Authorize(Roles = "recruiter,admin")]
     public async Task<ActionResult<List<ApplicationModel>>> getAllApplicationByPositionId(int positionId)
     {
         try
@@ -208,6 +209,22 @@ public class ApplicationController : ControllerBase
         {
             Console.WriteLine("2");
             return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("get/all/{positionId}")]
+    [Authorize(Roles = "admin,recruiter")]
+    public async Task<ActionResult> getAllCandidatesByPositionId(int positionId)
+    {
+        try
+        {
+            // get all candidates who have not applied for position.
+            List<ApplicationPositiondto> candidates = await applicationService.getAllByCandidateNotAppliedPosition(positionId);
+            return Ok(candidates);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest();
         }
     }
 }

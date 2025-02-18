@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using RecruitmentSystem.Controllers.Services;
 using RecruitmentSystem.Data;
@@ -92,6 +93,12 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
+var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(),"Resumes");
+
+if(!Directory.Exists(uploadsFolder)){
+    Directory.CreateDirectory(uploadsFolder);
+}
+
 app.UseCors("AllowSpecificOrigin");
 app.UseHttpsRedirection();
 app.UseAuthentication();
@@ -99,6 +106,10 @@ app.UseAuthentication();
 app.UseMiddleware<JwtMiddleware>();
 
 app.UseAuthorization();
+app.UseStaticFiles(new StaticFileOptions{
+    FileProvider = new PhysicalFileProvider(uploadsFolder),
+    RequestPath = "/Resumes"
+});
 
 app.MapControllers();
 

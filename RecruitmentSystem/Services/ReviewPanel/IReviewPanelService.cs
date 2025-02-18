@@ -4,7 +4,7 @@ namespace RecruitmentSystem.Services.ReviewPanel;
 
 public interface IReviewPanelSerivce
 {
-    Task<bool> assignReviewer(ReviewerPanelModel reviewerPanel);
+    Task<bool> assignReviewer(List<int> ids,int positionId);
 
     Task<ReviewerPanelModel> getReviewer(int empId, int positionId);
 
@@ -12,5 +12,5 @@ public interface IReviewPanelSerivce
 
     Task<ReviewerPanelModel> getReviewerById(int reviwerId);
 
-    Task<List<ReviewerPanelModel>> getReviwerByPositionId(int positionId);
+    Task<List<EmployeeReviewerdto>> getReviwerByPositionId(int positionId);
 }

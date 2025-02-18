@@ -17,6 +17,7 @@
     "react-query": "^3.39.3",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.5",
+    "react-select": "^5.10.0",
     "redux": "^5.0.1"
   },
   "devDependencies": {

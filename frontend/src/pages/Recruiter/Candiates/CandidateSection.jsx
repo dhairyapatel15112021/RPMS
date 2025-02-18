@@ -8,6 +8,7 @@ import { Modal } from '../../../component/Modal'
 import axios from 'axios'
 import { ApiEndPoints } from '../../../data/ApiEndPoints'
 import { ClickSVG } from '../../../component/Recruiter/ClickSVG'
+import { Link } from 'react-router-dom'
 
 // validation while manual canidation creation.
 // toast for proper error and sucess message.
@@ -16,44 +17,46 @@ export const CandidateSection = () => {
     const [isLoading, setLoading] = useState(true);
     const [candidates, setCandidates] = useState([]);
     const modalId = "candidate_modal";
-    const columns = ["CandidateId","Name","Email","Contact","Skills","Experience","Education","CV",""];
+    const columns = ["CandidateId", "Name", "Email", "Contact", "Applications", "Skills", "Experience", "Education", "CV", ""];
 
     const onChangeFunction = (event) => {
         setCandidateData({ ...candidateData, [event.target.name]: event.target.value });
     }
 
     const getAllCandidates = async () => {
-        try{
+        try {
             setLoading(true);
-            const response = await axios.get(ApiEndPoints.getAllCandidates,{headers : {Authorization : localStorage.getItem("token")}});
+            const response = await axios.get(ApiEndPoints.getAllCandidates, { headers: { Authorization: localStorage.getItem("token") } });
             setCandidates(response.data);
         }
-        catch(err){
+        catch (err) {
             console.log(err.message || err.response.data);
         }
-        finally{
+        finally {
             setLoading(false);
         }
     }
 
-    const onFileChange = async (event) =>{
+    const onFileChange = async (event) => {
         const file = event.target.files[0];
-        if(file === null){
+        if (file === null) {
             console.log("file is not selected");
             return;
         }
 
         const formData = new FormData();
-        formData.append('file',file)
-        
-        try{
-            const response = await axios.post(ApiEndPoints.addAllCandidate,formData,{headers : {
-                Authorization : localStorage.getItem("token"),
-                "Content-Type" : "multipart/form-data"
-            }});
+        formData.append('file', file)
+
+        try {
+            const response = await axios.post(ApiEndPoints.addAllCandidate, formData, {
+                headers: {
+                    Authorization: localStorage.getItem("token"),
+                    "Content-Type": "multipart/form-data"
+                }
+            });
             getAllCandidates();
         }
-        catch(err){
+        catch (err) {
             console.log(err.response.data || err.message);
         }
     }
@@ -64,6 +67,28 @@ export const CandidateSection = () => {
     { type: "password", name: "candidate_password", placeholder: "Password" },
     { type: "text", name: "candidate_linkdien", placeholder: "Linkdien" }];
 
+    const onCvChange = async (event, id) => {
+        try {
+            const file = event.target.files[0];
+            if (file === null) {
+                console.log("Please Select Valid Files");
+                return;
+            }
+            const data = new FormData();
+            data.append("cv", file);
+
+            const response = await axios.post(`${ApiEndPoints.uploadCV}${id}`, data, {
+                headers: {
+                    Authorization: localStorage.getItem("token"),
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+            getAllCandidates();
+        }
+        catch (err) {
+            console.log();
+        }
+    }
     const onSubmitFunction = async () => {
         try {
             const response = await axios.post(ApiEndPoints.addCandidate, candidateData, { headers: { Authorization: localStorage.getItem("token") } });
@@ -74,9 +99,9 @@ export const CandidateSection = () => {
         }
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         getAllCandidates();
-    },[]);
+    }, []);
 
     return (
         <div className='p-2 shadow-md mt-3 rounded-md w-full overflow-hidden'>
@@ -102,17 +127,33 @@ export const CandidateSection = () => {
                 candidates.length === 0 ? <div className='h-[65vh] flex justify-center items-center'> No Candidates Available </div> :
                     <Table columns={columns}>
                         {
-                           candidates.map((item, index) => {
+                            candidates.map((item, index) => {
                                 return (
                                     <tr key={index} className='text-center'>
                                         <td>{item.pk_candidate_id}</td>
                                         <td>{item.candidate_name}</td>
                                         <td>{item.candidate_email}</td>
                                         <td>{item.candidate_contact_number}</td>
+                                        <td><button className='btn'>Application</button></td>
                                         <td><button className='btn'>Skills</button></td>
                                         <td><button className='btn'>Experience</button></td>
                                         <td><button className='btn'>Education</button></td>
-                                        <td><button className='btn'>Upload CV</button></td>
+                                        <td>{
+                                            item.cv_path ?
+                                                <Link to={`http://localhost:5083${item.cv_path}`} target='_blank' className='flex justify-between items-center gap-2 w-fit bg-violet-100 text-blue-500 p-2 rounded-md cursor-pointer'>
+                                                    <div><Document /></div>
+                                                    <div>View</div>
+                                                </Link>
+                                                :
+                                                <div>
+                                                    <label for='upload-cv' className='flex justify-between items-center gap-2 bg-violet-100 text-blue-500 p-2 rounded-md cursor-pointer'>
+                                                        <div><Document /></div>
+                                                        <div>Upload</div>
+                                                    </label>
+                                                    <input onChange={(event) => onCvChange(event, item.pk_candidate_id)} id='upload-cv' type="file" accept='.pdf,.docx,.doc' className="file-input hidden" />
+                                                </div>
+                                        }
+                                        </td>
                                         <td>
                                             <details className="dropdown dropdown-left relative">
                                                 <summary className="btn p-0 h-fit"><ClickSVG /></summary>

@@ -44,7 +44,6 @@ public class SkillsServiceImpl : ISkillsService
                 throw new ArgumentNullException("Invalid Skill Id");
             }
             await _context.Skills.Where(s => s.pk_skills_id == skillToUpdate.pk_skills_id).ExecuteUpdateAsync(setters => setters
-            .SetProperty(p => p.is_min_req_skills, skills.is_min_req_skills)
             .SetProperty(p => p.skills_description, skills.skills_description)
             .SetProperty(p => p.skills_name, skills.skills_name));
             await _context.SaveChangesAsync();

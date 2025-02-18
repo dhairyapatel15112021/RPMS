@@ -15,17 +15,23 @@ namespace RecruitmentSystem.Controllers;
 public class CandidateController : ControllerBase
 {
 
-    public IEmployeeService employeeService;
+    public readonly IEmployeeService employeeService;
 
-    public ICandidateService candidateService;
+    public readonly ICandidateService candidateService;
 
-    public IExcelService excelService;
+    public readonly IExcelService excelService;
+
+    public readonly string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Resumes");
 
     public CandidateController(IEmployeeService employeeService, ICandidateService candidateService, IExcelService excelService)
     {
         this.employeeService = employeeService;
         this.candidateService = candidateService;
         this.excelService = excelService;
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
     }
 
     [HttpPost("add")]
@@ -113,6 +119,34 @@ public class CandidateController : ControllerBase
         catch (Exception ex)
         {
             return BadRequest(null);
+        }
+    }
+
+    [HttpPost("upload/cv/{candidateId}")]
+    public async Task<IActionResult> uploadCV(IFormFile cv, int candidateId)
+    {
+        try
+        {
+            if (cv == null || cv.Length == 0)
+            {
+                return BadRequest("No File Uploaded");
+            }
+            Console.WriteLine("HI -2 ");
+
+            var fileName = Path.GetFileNameWithoutExtension(cv.FileName) + "_" + candidateId + Path.GetExtension(cv.FileName);
+            var filePath = Path.Combine(folderPath, fileName);
+            Console.WriteLine("HI -2 ");
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await cv.CopyToAsync(stream);
+            }
+            Console.WriteLine("HI -2 ");
+            await candidateService.storeCvPathToDatabase($"/Resumes/{fileName}", candidateId);
+            return Ok("Uploaded Sucessfully");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 }

@@ -4,7 +4,7 @@ namespace RecruitmentSystem.Services.InterviewPanel;
 
 public interface IInterviewPanelService
 {
-    Task<bool> assignInterviewer(InterviewPanelModel interviewPanel);
+    Task<bool> assignInterviewer(List<int> ids,int positionId);
 
     Task<InterviewPanelModel> getInterviwer(int empId, int positionId);
 
@@ -12,5 +12,5 @@ public interface IInterviewPanelService
 
     Task<InterviewPanelModel> getInterviwerById(int interviwerId);
 
-    Task<List<InterviewPanelModel>> getInterviwerByPositionId(int positionId);
+    Task<List<EmployeeReviewerdto>> getInterviwerByPositionId(int positionId);
 }

@@ -13,21 +13,26 @@ public class InterviewPanelServiceImpl : IInterviewPanelService
         _context = context;
     }
 
-    public async Task<bool> assignInterviewer(InterviewPanelModel interviewPanel)
+    public async Task<bool> assignInterviewer(List<int> ids,int positionId)
     {
+       var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            InterviewPanelModel is_interviewer_exist = await getInterviwer(interviewPanel.fk_emp_interview_id, interviewPanel.fk_position_interview_id);
-            if (is_interviewer_exist != null)
-            {
-                throw new Exception("Interviwer Already Exist");
-            }
-            await _context.InterviewPanels.AddAsync(interviewPanel);
+            var existingInterviewer = await _context.InterviewPanels.Where(r => ids.Contains(r.fk_emp_interview_id) && r.fk_position_interview_id == positionId).ToListAsync();
+            var existingIds = existingInterviewer.Select(r => r.fk_emp_interview_id);
+            
+            var newInterviewer = ids.Where(id => !existingIds.Contains(id)).Select(id => new InterviewPanelModel{fk_emp_interview_id = id,fk_position_interview_id = positionId});
+            await _context.InterviewPanels.AddRangeAsync(newInterviewer);
+
+            await _context.InterviewPanels.Where(r => !ids.Contains(r.fk_emp_interview_id) && r.fk_position_interview_id == positionId).ExecuteDeleteAsync();
+
             await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
             return true;
         }
-        catch (Exception ex)
+        catch (Exception ex) 
         {
+            await transaction.RollbackAsync();
             Console.WriteLine(ex.Message);
             return false;
         }
@@ -43,10 +48,28 @@ public class InterviewPanelServiceImpl : IInterviewPanelService
         return await _context.InterviewPanels.FindAsync(interviwerId);
     }
 
-    public async Task<List<InterviewPanelModel>> getInterviwerByPositionId(int positionId)
+    public async Task<List<EmployeeReviewerdto>> getInterviwerByPositionId(int positionId)
     {
-        return await _context.InterviewPanels.Where(r => r.fk_position_interview_id == positionId).ToListAsync();
+        try
+        {
+            var result = from emp in _context.Employees join panel in _context.InterviewPanels on emp.pk_emp_id equals panel.fk_emp_interview_id where panel.fk_position_interview_id== positionId select new { emp };
+            List<EmployeeReviewerdto> interviewers = new List<EmployeeReviewerdto>();
+            foreach (var i in result)
+            {
+                EmployeeReviewerdto dto = new EmployeeReviewerdto();
 
+                dto.emp_name = i.emp.emp_name;
+                dto.pk_emp_id = i.emp.pk_emp_id;
+
+                interviewers.Add(dto);
+            }
+            return interviewers;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return [];
+        }
     }
 
     public async Task<bool> removeInterviwer(int interviwerId)

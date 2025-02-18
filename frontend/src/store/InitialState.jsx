@@ -10,5 +10,6 @@ export const InitialState = {
         isRecruiter : false,
         isHr: false,
         isViewer : false
-    }
+    },
+    isLogin : false
 };

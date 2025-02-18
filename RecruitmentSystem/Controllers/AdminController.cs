@@ -24,7 +24,7 @@ public class AdminController : ControllerBase
 
     [HttpPost]
     [Route("role/add")]
-    [Authorize(Roles = "admin,super_admin")]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult> addRoles([FromBody] RoleModel roleModel)
     {
         try
@@ -43,16 +43,20 @@ public class AdminController : ControllerBase
     }
 
     [HttpDelete("role/remove/{roleId}")]
-    [Authorize(Roles = "admin,super_admin")]
-    public async Task<ActionResult> removeRoles(int roleId){
-        try{
+    [Authorize(Roles = "admin")]
+    public async Task<ActionResult> removeRoles(int roleId)
+    {
+        try
+        {
             bool is_deleted = await roleService.removeRoles(roleId);
-            if(is_deleted){
-               return Ok("Delete Role");
+            if (is_deleted)
+            {
+                return Ok("Delete Role");
             }
-           return BadRequest("Something Went Wrong");
+            return BadRequest("Something Went Wrong");
         }
-        catch(Exception ex){
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
@@ -60,7 +64,7 @@ public class AdminController : ControllerBase
 
     [HttpPost]
     [Route("role/employee/map/{id}")]
-    [Authorize(Roles = "admin,super_admin")]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult> mapRoles(int id, [FromBody] int roleId)
     {
         try
@@ -75,25 +79,66 @@ public class AdminController : ControllerBase
     }
 
     [HttpGet("role/get/all")]
-    [Authorize(Roles = "admin,super_admin")]
-    public async Task<ActionResult> getAllRoles(){
-        try{
-          List<RoleModel> roles = await roleService.getAllRoles();
-          return Ok(roles);
+    [Authorize(Roles = "admin")]
+    public async Task<ActionResult> getAllRoles()
+    {
+        try
+        {
+            List<RoleModel> roles = await roleService.getAllRoles();
+            return Ok(roles);
         }
-        catch(Exception ex){
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }
 
     [HttpGet]
-    [Route("role/employee/map/{id}")]
-    [Authorize(Roles ="admin,super_admin")]
+    [Route("role/employee/{id}")]
+    [Authorize(Roles = "admin")]
     public async Task<ActionResult> getRoles(int id)
     {
         try
         {
             return Ok(await roleMapService.getRoles(id));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("reviewer")]
+    [Authorize(Roles = "admin,recruiter")]
+    public async Task<ActionResult<List<EmployeeReviewerdto>>> getEmployeeReviewer()
+    {
+        try
+        {
+            List<EmployeeReviewerdto> reviewers = roleMapService.getEmployeeRoles("Reviewer");
+            if (reviewers == null)
+            {
+                throw new Exception("Something went wrong");
+            }
+            return Ok(reviewers);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("interviewer")]
+    [Authorize(Roles = "admin,recruiter")]
+    public async Task<ActionResult<List<EmployeeReviewerdto>>> getEmployeeInterviewer()
+    {
+        try
+        {
+            List<EmployeeReviewerdto> interviwer = roleMapService.getEmployeeRoles("Interviewer");
+            if (interviwer == null)
+            {
+                throw new Exception("Something went wrong");
+            }
+            return Ok(interviwer);
         }
         catch (Exception ex)
         {

@@ -15,8 +15,6 @@ public class SkillsModel{
     [Required]
     public String skills_description {get;set;}
 
-    [Required]
-    public Boolean is_min_req_skills {get;set;}
 
     public ICollection<PositionSkillMapModel>? PositionSkill {get;} 
 

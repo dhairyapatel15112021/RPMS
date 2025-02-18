@@ -5,7 +5,7 @@ import { MiniSidebar } from '../../../component/MiniSidebar'
 import { Outlet } from 'react-router-dom'
 
 export const Candidates = () => {
-  const SidebarItem = [{ icon: <Percentage />, text: "Manage", to: "/recruiter/candidates/manage" }, { icon: <Percentage />, text: "Application", to: "/recruiter/candidates/application" }];
+  const SidebarItem = [{ icon: <Percentage />, text: "Candidates", to: "/recruiter/candidates/manage" }, { icon: <Percentage />, text: "Application", to: "/recruiter/candidates/application" }];
 
   return (
     <div className='w-[88vw] h-fit flex gap-2'>

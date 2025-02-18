@@ -1,7 +1,9 @@
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.EntityFrameworkCore;
 using RecruitmentSystem.Data;
+using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.Services.Application;
@@ -20,16 +22,14 @@ public class ApplicationServiceImpl : IApplicationService
         return await _context.Applications.FirstOrDefaultAsync(a => a.fk_candidate_id == candidateId && a.fk_position_id == positionId);
     }
 
-    public async Task<bool> applyApplication(ApplicationModel application)
+    public async Task<bool> applyApplication(List<int> ids, int positionId)
     {
         try
         {
-            ApplicationModel is_application_exist = await getApplication(application.fk_candidate_id, application.fk_position_id);
-            if (is_application_exist != null)
-            {
-                throw new Exception("Already Applied for this position");
-            }
-            await _context.Applications.AddAsync(application);
+            var existingApplications = await _context.Applications.Where(a => a.fk_position_id == positionId).ToListAsync();
+            var existingsIds = existingApplications.Select(a => a.fk_candidate_id);
+            var newApplications = ids.Where(id => !existingsIds.Contains(id)).Select(id => new ApplicationModel { fk_candidate_id = id, fk_position_id = positionId });
+            await _context.Applications.AddRangeAsync(newApplications);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -148,6 +148,32 @@ public class ApplicationServiceImpl : IApplicationService
         try
         {
             List<ApplicationModel> applications = await _context.Applications.Where(a => a.fk_position_id == positionId).ToListAsync();
+            return applications;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return null;
+        }
+    }
+
+    public async Task<List<ApplicationPositiondto>> getAllByCandidateNotAppliedPosition(int positionId)
+    {
+        try
+        {
+            List<ApplicationPositiondto> applications = new List<ApplicationPositiondto>();
+           var query = @"select * from Candidate where pk_candidate_id not in (select fk_candidate_id from Applications where fk_position_id = {0})";
+           var result = await _context.Candidate.FromSqlRaw(query,positionId).ToListAsync();
+            foreach (var r in result)
+            {
+                ApplicationPositiondto app = new ApplicationPositiondto();
+
+                app.candidate_email = r.candidate_email;
+                app.candidate_name = r.candidate_name;
+                app.pk_candidate_id = r.pk_candidate_id;
+
+                applications.Add(app);
+            }
             return applications;
         }
         catch (Exception ex)

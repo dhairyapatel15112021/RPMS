@@ -1,6 +1,6 @@
 import React from 'react'
-import { Sidebar } from '../../component/Sidebar/Sidebar'
-import { SidebarItem } from '../../component/Sidebar/SidebarItem'
+import { Sidebar } from '../../../component/Sidebar/Sidebar'
+import { SidebarItem } from '../../../component/Sidebar/SidebarItem'
 import { Outlet } from 'react-router-dom'
 
 export const Role = () => {

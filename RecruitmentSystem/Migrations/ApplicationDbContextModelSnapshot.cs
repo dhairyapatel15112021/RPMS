@@ -111,6 +111,9 @@ namespace RecruitmentSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("cv_path")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -381,6 +384,9 @@ namespace RecruitmentSystem.Migrations
                     b.Property<int>("fk_skills_id")
                         .HasColumnType("int");
 
+                    b.Property<bool>("is_min_req_skills")
+                        .HasColumnType("bit");
+
                     b.HasKey("pk_position_skill_id");
 
                     b.HasIndex("fk_position_id");
@@ -467,9 +473,6 @@ namespace RecruitmentSystem.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_skills_id"));
-
-                    b.Property<bool>("is_min_req_skills")
-                        .HasColumnType("bit");
 
                     b.Property<string>("skills_description")
                         .IsRequired()

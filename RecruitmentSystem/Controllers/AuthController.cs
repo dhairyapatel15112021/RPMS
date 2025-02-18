@@ -48,7 +48,22 @@ public class AuthController : ControllerBase
             Dictionary<string, List<string>> res = await jwtService.generateToken(login.email, login.is_candidate, id, configuration);
             string token = res["token"][0];
             List<string> roles = res["roles"];
-            return Ok(new { token, roles , id });
+            return Ok(new { token, roles, id });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPost("me")]
+    public async Task<ActionResult> validateUser([FromBody] string token)
+    {
+        try
+        {
+            TokenValidator result = jwtService.validateToken(token);
+            result.is_validated = true;
+            return Ok(result);
         }
         catch (Exception ex)
         {

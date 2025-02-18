@@ -16,13 +16,15 @@ public class CandidateServiceImpl : ICandidateService
 
     public async Task<bool> addCandidate(CandidateModel candidate)
     {
-        try{
+        try
+        {
             candidate.candidate_password = BCrypt.Net.BCrypt.HashPassword(candidate.candidate_password);
-             await _context.Candidate.AddAsync(candidate);
-             await _context.SaveChangesAsync();
-             return true;
+            await _context.Candidate.AddAsync(candidate);
+            await _context.SaveChangesAsync();
+            return true;
         }
-        catch(Exception ex){
+        catch (Exception ex)
+        {
             Console.WriteLine(ex.Message);
             return false;
         }
@@ -49,7 +51,7 @@ public class CandidateServiceImpl : ICandidateService
 
     public async Task<List<CandidateModel>> getAllCandidates()
     {
-       return await _context.Candidate.ToListAsync();
+        return await _context.Candidate.ToListAsync();
     }
 
     public async Task<CandidateModel> getCandidateByEmail(string email)
@@ -67,5 +69,23 @@ public class CandidateServiceImpl : ICandidateService
         return _context.Candidate.FirstOrDefault(c => c.pk_candidate_id == id);
     }
 
-    
+    public async Task<bool> storeCvPathToDatabase(string filePath, int candidateId)
+    {
+        try
+        {
+            CandidateModel candidate = await getCandidateById(candidateId);
+            if (candidate == null)
+            {
+                throw new Exception("Invalid Id");
+            }
+            candidate.cv_path = filePath;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return false;
+        }
+    }
 }

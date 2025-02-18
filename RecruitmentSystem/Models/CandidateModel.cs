@@ -25,6 +25,8 @@ public class CandidateModel
     [Required]
     public String candidate_password { get; set; }
 
+    public String? cv_path { get; set; }
+
     public String? candidate_linkdien { get; set; }
 
     [DefaultValue("candidate")]
@@ -33,6 +35,6 @@ public class CandidateModel
 
     public ICollection<DocuementModel>? Document { get; }
 
-    public ICollection<ApplicationModel>? Applications {get;}
-    
+    public ICollection<ApplicationModel>? Applications { get; }
+
 }

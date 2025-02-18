@@ -1,10 +1,8 @@
+using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.Services.PositionSkill;
 public interface IPositionSkillService {
-    Task<bool> addSkillToPosition(PositionSkillMapModel positionSkillMapModel);
-    void getAllPositionSkills();
-    Task<PositionSkillMapModel> getSkillPositionByPositionIdAndSkillId(int positionId, int skillId);
-
-    Task<bool> removeSkillToPosition(int positionId, int skillId);
+    Task<bool> addSkillToPosition(PositionSkilldto positionSkilldto);
+    Task<List<Skilldto>> getAllPositionSkills(int positionId);
 }

@@ -9,14 +9,14 @@ export const ProtectedRoute = ({ roles, children }) => {
     const [isAuthorised, setAuthorised] = useState(false);
 
     useState(() => {
-
+        console.log(data);  
         for (let i = 0; i < roles.length; i++) {
             if ((roles[i] === "admin" && data?.user?.isAdmin)
                 || (roles[i] === "hr" && data?.user?.isHr)
                 || (roles[i] === "interviewer" && data?.user?.isInterviewer)
                 || (roles[i] === "reviewer" && data?.user?.isReviewer)
                 || (roles[i] === "recruiter" && data?.user?.isRecruiter)
-                || (roles[i] === "admin" && data?.user?.isCandidate)) {
+                || (roles[i] === "candidate" && data?.user?.isCandidate)) {
                 setLoading(false);
                 setAuthorised(true);
                 return;
