@@ -76,6 +76,11 @@ public class RoleMapServiceImpl : IRoleMapService
     {
         try
         {
+            EmpRoleMapModel role_exist = await _context.RolesMap.FirstOrDefaultAsync(r => r.fk_emp_id == empId && r.fk_role_id == roleId);
+            if (role_exist != null)
+            {
+                throw new Exception("Already Role Exist");
+            }
             EmpRoleMapModel role_map = new EmpRoleMapModel();
             role_map.fk_emp_id = empId;
             role_map.fk_role_id = roleId;

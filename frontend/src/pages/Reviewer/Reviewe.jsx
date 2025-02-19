@@ -4,7 +4,6 @@ import { SidebarItem } from '../../component/Sidebar/SidebarItem'
 import { Title } from '../../component/Title'
 import { Outlet } from 'react-router-dom'
 import { Job } from '../../component/Recruiter/Job'
-import { useSelector } from 'react-redux'
 
 export const Reviewe = () => {
 

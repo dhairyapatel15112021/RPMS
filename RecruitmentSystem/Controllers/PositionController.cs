@@ -262,11 +262,31 @@ public class PositionController : ControllerBase
     }
 
     [HttpGet("get/reviewe/{employeeId}")]
+    [Authorize(Roles = "admin,Reviewer")]
     public async Task<ActionResult> getPositionByReviewer(int employeeId)
     {
         try
         {
             List<PositionDTO> positions = reviewPanelSerivce.getPositionByEmployeeId(employeeId);
+            if (positions == null)
+            {
+                Console.WriteLine("Something Went Wrong");
+            }
+            return Ok(positions);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpGet("get/interview/{employeeId}")]
+    [Authorize(Roles = "admin,Interviewer")]
+    public async Task<ActionResult<PositionDTO>> getPositionByInterview(int employeeId)
+    {
+        try
+        {
+            List<PositionDTO> positions = interviewPanelService.getPositionByEmployeeId(employeeId);
             if (positions == null)
             {
                 Console.WriteLine("Something Went Wrong");
@@ -300,6 +320,7 @@ public class PositionController : ControllerBase
     }
 
     [HttpPost("interviwer/add/{positionId}")]
+    [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult> assignInterviewer([FromBody] List<int> ids, int positionId)
     {
         try
@@ -342,7 +363,9 @@ public class PositionController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
+
     [HttpGet("interviewer/get")]
+    [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult<List<EmployeeReviewerdto>>> getInterviewerPanel([FromQuery] int positionId)
     {
         try

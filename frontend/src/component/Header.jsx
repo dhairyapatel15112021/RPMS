@@ -9,8 +9,10 @@ const Header = () => {
 
     return (
         <div className='w-[100vw] h-[10vh] flex justify-between items-center p-5 shadow-sm'>
-            <div className='font-bold tracking-wide md:text-2xl text-lg'>RPMS</div>
 
+
+            {data != undefined && data.isLogin ? <Link className='font-bold tracking-wide md:text-2xl text-lg' to="/navigation">RPMS</Link> :
+                <Link to="/login" className='font-bold tracking-wide md:text-2xl text-lg'>RPMS</Link>}
             <div className='flex gap-2'>
                 {data != undefined && data.isLogin ? <div className='p-1 bg-blue-700 text-white rounded-md cursor-pointer'><User /></div> :
                     <Link to="/login" className='bg-blue-700 text-white px-2 py-1 tracking-wider rounded-md text-sm md:text-base'>LOGIN</Link>}

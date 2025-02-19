@@ -12,7 +12,7 @@ export const Modal = ({ onchange, data, onsubmit, id, title, inputs }) => {
                                 return (
                                     input.name === "no_of_hr_round" || input.name === "no_of_tech_round" ?
                                         <div>
-                                            <input key={index} type={input.type} className="input mb-2" placeholder={data?.[input.name] || input.placeholder} name={input.name} onChange={onchange} />
+                                            <input key={index} type={input.type} className="input mb-2" value={data?.[input.name]} placeholder={data?.[input.name] || input.placeholder} name={input.name} onChange={onchange} />
                                             <div className='flex items-center gap-2'>
                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info h-2 w-2 shrink-">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -21,7 +21,7 @@ export const Modal = ({ onchange, data, onsubmit, id, title, inputs }) => {
                                             </div>
                                         </div>
                                         :
-                                        <input key={index} type={input.type} className="input mb-2" placeholder={data?.[input.name] || input.placeholder} name={input.name} onChange={onchange} />
+                                        <input key={index} value={data?.[input.name]} type={input.type} className="input mb-2" placeholder={data?.[input.name] || input.placeholder} name={input.name} onChange={onchange} />
                                 )
                             })
                         }

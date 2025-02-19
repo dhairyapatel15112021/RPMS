@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using RecruitmentSystem.Models;
@@ -20,6 +21,7 @@ public class InterviewController : ControllerBase
     }
 
     [HttpPost("schedule")]
+    [Authorize(Roles = "admin,recruiter")]
     public async Task<ActionResult<InterviewSchedulerModel>> scheduleInterview([FromBody] InterviewSchedulerModel interviewScheduler)
     {
         try
@@ -36,6 +38,21 @@ public class InterviewController : ControllerBase
         {
             Console.WriteLine(ex.Message);
             return null;
+        }
+    }
+
+    [HttpGet("schedule/{applicationId}")]
+    [Authorize(Roles = "admin,recruiter,Interviewer,candidate")]
+    public async Task<ActionResult<InterviewSchedulerModel>> getScheduleInterview(int applicationId)
+    {
+        try
+        {
+            InterviewSchedulerModel interviewScheduler = await interviewSchedulerService.getScheduledInterview(applicationId);
+            return Ok(interviewScheduler);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
         }
     }
 

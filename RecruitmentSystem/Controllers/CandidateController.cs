@@ -75,31 +75,12 @@ public class CandidateController : ControllerBase
                 throw new Exception("File is empty");
             }
             List<Dictionary<string, string>> data = await excelService.extractData(file);
-            foreach (var dataEntry in data)
+            bool is_all_saved = await candidateService.addAllCandidates(data);
+            if (is_all_saved)
             {
-                EmployeesModel is_employees_exist = await employeeService.getEmployeeByEmail(dataEntry["email"]);
-                CandidateModel is_candidate_exist = await candidateService.getCandidateByEmail(dataEntry["email"]);
-                if (is_employees_exist != null || is_candidate_exist != null)
-                {
-                    Console.WriteLine("Already Exist With This Email Id");
-                    continue;
-                }
-                CandidateModel candidate = new CandidateModel();
-                candidate.candidate_email = dataEntry["email"];
-                candidate.candidate_contact_number = dataEntry["contact"];
-                candidate.candidate_name = dataEntry["name"];
-                candidate.candidate_password = dataEntry["password"];
-                bool is_saved = await candidateService.addCandidate(candidate);
-                if (is_saved)
-                {
-                    Console.WriteLine("Candidate with email " + candidate.candidate_email + " is saved");
-                }
-                else
-                {
-                    Console.WriteLine("Candidate with email " + candidate.candidate_email + " is not saved");
-                }
+                return Ok("Done");
             }
-            return Ok(data);
+            return BadRequest("something went wrong");
         }
         catch (Exception ex)
         {

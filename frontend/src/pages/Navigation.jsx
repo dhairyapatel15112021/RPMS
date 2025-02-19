@@ -20,7 +20,7 @@ export const Navigation = () => {
                         <div><Chevron /></div>
                     </Link>
                     }
-                    {data?.user?.isInterviewer && <Link to="/" className='flex justify-between items-center border border-blue-200 rounded-md shadow-2xs p-2'>
+                    {data?.user?.isInterviewer && <Link to="/interviewer/position" className='flex justify-between items-center border border-blue-200 rounded-md shadow-2xs p-2'>
                         <div>Interviewer</div>
                         <div><Chevron /></div>
                     </Link>}

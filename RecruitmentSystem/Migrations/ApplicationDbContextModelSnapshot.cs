@@ -54,7 +54,12 @@ namespace RecruitmentSystem.Migrations
 
                     b.HasIndex("fk_position_id");
 
-                    b.ToTable("Applications");
+                    b.ToTable("Applications", t =>
+                        {
+                            t.HasTrigger("application_status");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.CandidateInterviewModel", b =>
@@ -64,6 +69,12 @@ namespace RecruitmentSystem.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_interview_id"));
+
+                    b.Property<int>("Index")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDone")
+                        .HasColumnType("bit");
 
                     b.Property<int>("fk_interview_scheduler_id")
                         .HasColumnType("int");

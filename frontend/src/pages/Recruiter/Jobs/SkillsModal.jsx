@@ -43,7 +43,7 @@ export const SkillsModal = ({ id, positionId }) => {
                 value: skill.pk_skills_id,
                 label: skill.skills_name
             }));
-console.log(localskills);
+            console.log(localskills);
             for (let i = 0; i < localskills.length; i++) {
                 if (localskills[i].is_min_req_skills) localMinimumRequiredSkill.push(formatted_skill[i]);
                 else localPreferedSkill.push(formatted_skill[i]);

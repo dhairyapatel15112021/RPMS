@@ -36,9 +36,12 @@ export const ApiEndPoints = {
     applyApplication : `${BASE_URL}/application/apply/`,
     uploadCV : `${BASE_URL}/candidate/upload/cv/`,
     getAllReviewePosition : `${BASE_URL}/position/get/reviewe/`,
+    getAllInterviewPosition : `${BASE_URL}/position/get/interview/`,
     getAllApplicationByPosition:`${BASE_URL}/application/position/get/all/`,
     addFeedbackReviewe: `${BASE_URL}/application/review/feedback/add`,
     getRevieweFeedback : `${BASE_URL}/application/get/review/`,
     changeApplication : `${BASE_URL}/application/change/`,
-    holdApplication : `${BASE_URL}/application/hold/`
+    holdApplication : `${BASE_URL}/application/hold/`,
+    getInterviewScheduler : `${BASE_URL}/interview/schedule/`,
+    scheduleInterview : `${BASE_URL}/interview/schedule`,
 }

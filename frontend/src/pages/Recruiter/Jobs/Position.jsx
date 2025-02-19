@@ -43,7 +43,7 @@ export const Position = () => {
   const modalCloseId = "position_close_id";
 
   const patchOnChange = (event) => {
-    console.log("hi");
+    console.log(event.target.value);
     setPatchPositionData({ ...patchPositionData, [event.target.name]: event.target.value });
   }
 

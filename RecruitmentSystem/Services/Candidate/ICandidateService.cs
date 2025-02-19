@@ -14,4 +14,5 @@ public interface ICandidateService
     Task<bool> addCandidate(CandidateModel candidate);
     Task<List<CandidateModel>> getAllCandidates();
     Task<bool> storeCvPathToDatabase(string filePath, int candidateId);
+    Task<bool> addAllCandidates(List<Dictionary<string, string>> data);
 }

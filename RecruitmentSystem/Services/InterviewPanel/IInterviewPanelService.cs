@@ -1,3 +1,4 @@
+using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.Services.InterviewPanel;
@@ -13,4 +14,5 @@ public interface IInterviewPanelService
     Task<InterviewPanelModel> getInterviwerById(int interviwerId);
 
     Task<List<EmployeeReviewerdto>> getInterviwerByPositionId(int positionId);
+    List<PositionDTO> getPositionByEmployeeId(int employeeId);
 }

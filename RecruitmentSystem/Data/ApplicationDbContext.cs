@@ -48,6 +48,7 @@ namespace RecruitmentSystem.Data
             // trigger
             modelBuilder.Entity<ApplicationModel>().ToTable(tb => tb.HasTrigger("application_status"));
 
+
             // Registering Relationship
 
             // relationship for which employee create position

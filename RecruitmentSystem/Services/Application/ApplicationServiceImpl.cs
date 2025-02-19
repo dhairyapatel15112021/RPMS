@@ -151,8 +151,10 @@ public class ApplicationServiceImpl : IApplicationService
             List<ApplicationStatus> reviewIds = [ApplicationStatus.review];
             List<ApplicationStatus> interviewIds = [ApplicationStatus.interview];
 
-            var result = from application in _context.Applications join can in _context.Candidate on application.fk_candidate_id equals can.pk_candidate_id where application.fk_position_id == positionId && (id == 1 ? ids.Contains(application.applicationStatus) : reviewIds.Contains(application.applicationStatus)) select new { application, can.candidate_name, can.candidate_email, can.cv_path };
-
+            var result = from application in _context.Applications join can in _context.Candidate on application.fk_candidate_id equals can.pk_candidate_id where application.fk_position_id == positionId  && (id == 1 ? ids.Contains(application.applicationStatus) : (id == 3 ? interviewIds.Contains(application.applicationStatus) : reviewIds.Contains(application.applicationStatus)) ) select new { application, can.candidate_name, can.candidate_email, can.cv_path };
+            // from application in _context.Applications join can in _context.Candidate on application.fk_candidate_id equals can.pk_candidate_id where application.fk_position_id == positionId  && (id == 1 ? ids.Contains(application.applicationStatus) : reviewIds.Contains(application.applicationStatus)) select new { application, interview, can.candidate_name, can.candidate_email, can.cv_path };
+            // List<ApplicationModel> applications = await _context.Applications.Where(a => a.fk_position_id == positionId && (id == 1 ? ids.Contains(a.applicationStatus) : reviewIds.Contains(a.applicationStatus))).Include(a => a.InterviewSchedulers).ToListAsync();
+            // Console.WriteLine(applications);
             List<Applicationdto> applications = new List<Applicationdto>();
             foreach (var app in result)
             {

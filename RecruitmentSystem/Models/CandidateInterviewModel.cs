@@ -20,7 +20,10 @@ public class CandidateInterviewModel
     [Required]
     public InterviewType interview_type { get; set; }
 
-    public InterviewSchedulerModel? InterviewScheduler {get;set;}
+    public bool IsDone { get; set; }
+    public int Index { get; set; }
 
-     public ICollection<InterviewFeedbackModel>? InterviewFeedbacks {get;}
+    public InterviewSchedulerModel? InterviewScheduler { get; set; }
+
+    public ICollection<InterviewFeedbackModel>? InterviewFeedbacks { get; }
 }

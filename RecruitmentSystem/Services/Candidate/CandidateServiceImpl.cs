@@ -14,6 +14,41 @@ public class CandidateServiceImpl : ICandidateService
         _context = context;
     }
 
+    public async Task<bool> addAllCandidates(List<Dictionary<string, string>> data)
+    {
+        var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            List<CandidateModel> allCandidates = new List<CandidateModel>();
+            foreach (var dataEntry in data)
+            {
+                EmployeesModel is_employees_exist = await _context.Employees.FirstOrDefaultAsync(e => e.emp_email == dataEntry["email"]);
+                CandidateModel is_candidate_exist = await getCandidateByEmail(dataEntry["email"]);
+                if (is_employees_exist != null || is_candidate_exist != null)
+                {
+                    Console.WriteLine("Already Exist With This Email Id");
+                    continue;
+                }
+                CandidateModel candidate = new CandidateModel();
+                candidate.candidate_email = dataEntry["email"];
+                candidate.candidate_contact_number = dataEntry["contact"];
+                candidate.candidate_name = dataEntry["name"];
+                candidate.candidate_password = dataEntry["password"];
+                allCandidates.Add(candidate);
+            }
+
+            await _context.Candidate.AddRangeAsync(allCandidates);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            Console.WriteLine(ex.Message);
+            return false;
+        }
+    }
     public async Task<bool> addCandidate(CandidateModel candidate)
     {
         try
@@ -81,7 +116,7 @@ public class CandidateServiceImpl : ICandidateService
             }
             candidate.cv_path = filePath;
 
-            await _context.Applications.Where(app => app.fk_candidate_id == candidateId).ExecuteUpdateAsync(id => id.SetProperty(a => a.applicationStatus , ApplicationStatus.review));
+            await _context.Applications.Where(app => app.fk_candidate_id == candidateId).ExecuteUpdateAsync(id => id.SetProperty(a => a.applicationStatus, ApplicationStatus.review));
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
             return true;

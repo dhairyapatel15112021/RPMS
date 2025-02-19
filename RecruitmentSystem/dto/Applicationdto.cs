@@ -2,7 +2,8 @@ using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.dto;
 
-public class Applicationdto{
+public class Applicationdto
+{
 
     public ApplicationModel application;
     public string? candidate_name;

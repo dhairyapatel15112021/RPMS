@@ -1,43 +1,27 @@
-import React, { useState, useEffect } from 'react'
-import Loader from '../../../component/Loader';
-import { SearchInput } from '../../../component/Recruiter/SearchInput';
-import { Table } from '../../../component/Table';
-import { ClickSVG } from '../../../component/Recruiter/ClickSVG';
 import axios from 'axios';
-import { ApiEndPoints } from '../../../data/ApiEndPoints';
-import { Modal } from '../../../component/Modal';
+import React, { useState, useEffect } from 'react'
+import { ApiEndPoints } from '../../data/ApiEndPoints';
+import Loader from '../../component/Loader';
+import { Table } from '../../component/Table';
+import { SearchInput } from '../../component/Recruiter/SearchInput';
+import { Link } from 'react-router-dom';
+import { ClickSVG } from '../../component/Recruiter/ClickSVG';
+import { Document } from '../../component/Document';
 
-export const ApplicationCandidateModal = ({ id, positionId }) => {
+export const ApplicationInterviewModal = ({ empId, id, positionId, setPositionId }) => {
     const [applications, setApplications] = useState([]);
     const [isLoading, setLoading] = useState(true);
-    const [interscheduleData, setInterviewScheduleData] = useState({
-        "fk_application_id": 0,
-        "no_of_hr_round": 1,
-        "no_of_tech_round": 2,
-        "assesment_link": "",
-        "interview_link": "",
-        "interview_date": "",
-        "interview_time": ""
-    });
-    const columns = ["Name", "Email", "Date", "Status", ""];
+    const columns = ["Name", "Email", "Date", "Status", "CV", ""];
     const applicationStatus = ["applied", "review", "interview", "completed", "hired", "on_hold"];
-    const interviewScheduleModal = "interview_schedule_modal";
-    const inputs = [{ type: "number", name: "no_of_hr_round", placeholder: "HR Round" },
-    { type: "number", name: "no_of_tech_round", placeholder: "Tech Round" },
-    { type: "text", name: "assesment_link", placeholder: "Assesment Link" },
-    { type: "text", name: "interview_link", placeholder: "Meeting Link" },
-    { type: "time", name: "interview_time", placeholder: "Time" },
-    { type: "date", name: "interview_date", placeholder: "Date" }
-    ]
     const getApplications = async () => {
         try {
             if (positionId === 0) {
                 setLoading(false);
                 return;
             }
-            setApplications([]);
             setLoading(true);
-            const response = await axios.get(`${ApiEndPoints.getAllApplicationByPosition}${positionId}?id=1`, { headers: { Authorization: localStorage.getItem("token") } });
+            const response = await axios.get(`${ApiEndPoints.getAllApplicationByPosition}${positionId}?id=3`, { headers: { Authorization: localStorage.getItem("token") } });
+            console.log(response.data);
             setApplications(response.data);
         }
         catch (err) {
@@ -48,39 +32,14 @@ export const ApplicationCandidateModal = ({ id, positionId }) => {
         }
     }
 
-    const setApplicationHoldSettings = async (applicationId) => {
+    const setCompletedStageSettings = async (id) => {
         try {
-            const response = await axios.put(`${ApiEndPoints.holdApplication}${applicationId}`, null, { headers: { Authorization: localStorage.getItem("token") } });
-            console.log(response.data);
+            const response = await axios.patch(`${ApiEndPoints.changeApplication}${id}`, [{
+                "path": "applicationStatus",
+                "op": "replace",
+                "value": 3
+            }], { headers: { Authorization: localStorage.getItem("token") } });
             getApplications();
-        }
-        catch (err) {
-            console.log(err.message || err.response.data);
-        }
-    }
-
-    const setInterviewSettings = async (applicationId) => {
-        try {
-            const response = await axios.get(`${ApiEndPoints.getInterviewScheduler}${applicationId}`, { headers: { Authorization: localStorage.getItem("token") } });
-            console.log(response.data);
-            if (response.data != null)
-                setInterviewScheduleData(() => response.data);
-            else
-                setInterviewScheduleData({ ...interscheduleData, "fk_application_id": applicationId });
-            document.getElementById(interviewScheduleModal).showModal();
-        }
-        catch (err) {
-            console.log(err.message || err.response.data);
-        }
-    }
-    const onChangeFunction = (event) => {
-        setInterviewScheduleData({ ...interscheduleData, [event.target.name]: event.target.value });
-    }
-
-    const submitInterviewScheduler = async () => {
-        try {
-            const response = await axios.post(`${ApiEndPoints.scheduleInterview}`, interscheduleData, { headers: { Authorization: localStorage.getItem("token") } });
-            console.log(response.data);
         }
         catch (err) {
             console.log(err.message || err.response.data);
@@ -93,7 +52,7 @@ export const ApplicationCandidateModal = ({ id, positionId }) => {
 
     return (
         <dialog id={id} className="modal w-full">
-            <Modal id={interviewScheduleModal} inputs={inputs} data={interscheduleData} title="Schedule Interview" onchange={onChangeFunction} onsubmit={submitInterviewScheduler} />
+            {/* <Modal data={{ "comments": comments }} id={modalId} onchange={onChangeFunction} onsubmit={onsubmitFunction} title="Add Feedback" inputs={inputs} /> */}
             <div className="modal-box w-11/12 max-w-5xl pt-0">
                 <div className="modal-action">
                     {isLoading ? <Loader /> :
@@ -116,14 +75,22 @@ export const ApplicationCandidateModal = ({ id, positionId }) => {
                                                             <td>{item.application.application_date?.split("T")[0]}</td>
                                                             <td>{applicationStatus[item.application.applicationStatus]}</td>
                                                             <td>
+                                                                {
+                                                                    item.cv_path ?
+                                                                        <Link to={`http://localhost:5083${item.cv_path}`} target='_blank' className='flex justify-between items-center gap-2 w-fit bg-violet-100 text-blue-500 p-2 rounded-md cursor-pointer justify-self-center'>
+                                                                            <div><Document /></div>
+                                                                            <div>View</div>
+                                                                        </Link>
+                                                                        :
+                                                                        "Not Uploaded"
+                                                                }
+                                                            </td>
+                                                            <td>
                                                                 <details className="dropdown dropdown-left relative">
                                                                     <summary className="btn p-0 h-fit"><ClickSVG /></summary>
                                                                     <ul className="menu dropdown-content bg-base-100 rounded-box absolute z-1 w-fit p-2 shadow-sm">
-                                                                        <li><div onClick={() => setApplicationHoldSettings(item.application.pk_application_id)}>Hold</div></li>
-                                                                        {
-                                                                            item.application.applicationStatus === 2 && <li><div onClick={() => setInterviewSettings(item.application.pk_application_id)}>Schedule Interview</div></li>
-                                                                        }
-                                                                        {/* <li><div>like schedule interview etc</div></li> */}
+                                                                        <li><div>Interview Round</div></li>
+                                                                        <li><div onClick={() => setCompletedStageSettings(item.application.pk_application_id)}>Select</div></li>
                                                                     </ul>
                                                                 </details>
                                                             </td>

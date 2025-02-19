@@ -12,11 +12,11 @@ export const ClosePosition = ({ positionId, onchange, onsubmit, id, title }) => 
 
     const getAllAppliedCandidates = async () => {
         try {
-            if(positionId == 0){
+            if (positionId == 0) {
                 return;
             }
             setLoading(true);
-            const response = await axios.get(`${ApiEndPoints.getAllApplicationByPositionId}${positionId}`,{headers : {Authorization : localStorage.getItem("token")}});
+            const response = await axios.get(`${ApiEndPoints.getAllApplicationByPosition}${positionId}?id=1`, { headers: { Authorization: localStorage.getItem("token") } });
             setOptions(response.data);
         }
         catch (err) {
@@ -41,8 +41,8 @@ export const ClosePosition = ({ positionId, onchange, onsubmit, id, title }) => 
                             <option disabled={true}>Select Candidate</option>
                             {isLoading ? <span className="loading loading-spinner loading-sm"></span> : options.length === 0 ? <option>No Candidate Apply For this position</option> :
                                 options.map((opt) => {
-                                    return(
-                                        <option value={opt.fk_candidate_id}>{opt.fk_candidate_id}</option>
+                                    return (
+                                        <option value={opt.application.fk_candidate_id}>{opt.candidate_name}</option>
                                     )
                                 })}
                         </select>

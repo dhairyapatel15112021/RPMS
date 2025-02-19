@@ -19,6 +19,8 @@ import { CandidateSection } from './pages/Recruiter/Candiates/CandidateSection.j
 import { Application } from './pages/Recruiter/Candiates/Application.jsx'
 import { Reviewe } from './pages/Reviewer/Reviewe.jsx'
 import { ReviewPositions } from './pages/Reviewer/ReviewPositions.jsx'
+import { Interviewer } from './pages/Interviewer/Interviewer.jsx'
+import { InterviewPositions } from './pages/Interviewer/InterviewPositions.jsx'
 
 const router = createBrowserRouter(
   [
@@ -52,8 +54,13 @@ const router = createBrowserRouter(
           ]
         },
         {
-          path: "reviewer", element: <ProtectedRoute roles={["reviewer"]}><Reviewe /></ProtectedRoute> , children : [
-            {path : "position",element : <ProtectedRoute roles={["reviewer"]}><ReviewPositions/></ProtectedRoute>}
+          path: "reviewer", element: <ProtectedRoute roles={["reviewer"]}><Reviewe /></ProtectedRoute>, children: [
+            { path: "position", element: <ProtectedRoute roles={["reviewer"]}><ReviewPositions /></ProtectedRoute> }
+          ]
+        },
+        {
+          path: "interviewer", element: <ProtectedRoute roles={["interviewer"]}><Interviewer /></ProtectedRoute>, children: [
+            { path: "position", element: <ProtectedRoute roles={["interviewer"]}><InterviewPositions /></ProtectedRoute> }
           ]
         }
       ]

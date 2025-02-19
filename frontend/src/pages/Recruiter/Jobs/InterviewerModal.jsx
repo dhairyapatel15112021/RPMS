@@ -60,8 +60,8 @@ export const InterviewerModal = ({ positionId, id }) => {
 
     const onsubmitFunction = async () => {
         try {
-            const ids = positionInterviewer.map((interviewer)=> interviewer.value);
-            const response = await axios.post(`${ApiEndPoints.addPositionInterviewer}${positionId}`,ids,{headers : {Authorization : localStorage.getItem("token")}});
+            const ids = positionInterviewer.map((interviewer) => interviewer.value);
+            const response = await axios.post(`${ApiEndPoints.addPositionInterviewer}${positionId}`, ids, { headers: { Authorization: localStorage.getItem("token") } });
             console.log("done");
         }
         catch (err) {
