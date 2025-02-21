@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { Toast } from '../../../component/Toast/Toast';
-import { ToastSucess } from '../../../component/Toast/ToastSucess'
 import { ApiEndPoints } from '../../../data/ApiEndPoints';
 import { DeleteSVG } from '../../../component/DeleteSVG.JSX';
 import axios from 'axios';
@@ -11,6 +9,7 @@ import { ClickSVG } from '../../../component/Recruiter/ClickSVG';
 import Loader from '../../../component/Loader';
 import { Modal } from '../../../component/Modal';
 import { EmployeeRoleModal } from './EmployeeRoleModal';
+import toast from 'react-hot-toast';
 
 // validation while creating new employee
 // toast for error and sucess
@@ -24,16 +23,16 @@ export const Employee = () => {
   const [Error, setError] = useState("");
   const [Sucess, setSucess] = useState("");
   const [isLoading, setLoading] = useState(true);
-  const [employeeId,setEmployeeId] = useState(0);
-  const [roles,setRoles] = useState([]);
-  const [roleId,setRoleId] = useState(0);
+  const [employeeId, setEmployeeId] = useState(0);
+  const [roles, setRoles] = useState([]);
+  const [roleId, setRoleId] = useState(0);
 
   const columns = ["", "Employee ID", "Name", "Designation", "Email", "Contact Number", "Joining Date", "Remove", ""];
   const inputs = [{ type: "text", placeholder: "Name", name: "emp_name" },
   { type: "email", placeholder: "Email", name: "emp_email" },
+  { type: "password", placeholder: "Password", name: "emp_password" },
   { type: "text", placeholder: "Contact", name: "emp_contact_number" },
   { type: "text", placeholder: "Designation", name: "emp_designation" },
-  { type: "password", placeholder: "Password", name: "emp_password" },
   { type: "date", placeholder: "Joining Date", name: "emp_joining_date" }];
   const modalId = "employee_modal";
   const employeeRoleModal = "employee_role_modal";
@@ -44,11 +43,13 @@ export const Employee = () => {
 
   const onSubmitFunction = async () => {
     try {
-      const response = await axios.post(`${ApiEndPoints.addEmployees}`,employeeData,{headers : {Authorization : localStorage.getItem("token")}});
+      const response = await axios.post(`${ApiEndPoints.addEmployees}`, employeeData, { headers: { Authorization: localStorage.getItem("token") } });
       setEmployeeData({ "emp_name": "", "emp_email": "", "emp_contact_number": "", "emp_designation": "", "emp_password": "", "emp_joining_date": "" });
+      toast.success("Employee Created Sucessfully")
       getEmployees();
     }
     catch (err) {
+      toast.error(rr.message || err.response.data);
       console.log(err.message || err.response.data);
     }
   }
@@ -70,13 +71,13 @@ export const Employee = () => {
   }
 
   const MapRolesToEmployee = async (emp) => {
-    try{
-      const response = await axios.get(`${ApiEndPoints.getRoles}`,{headers : {Authorization : localStorage.getItem('token')}});
+    try {
+      const response = await axios.get(`${ApiEndPoints.getRoles}`, { headers: { Authorization: localStorage.getItem('token') } });
       setRoles(() => response.data);
       setEmployeeId(() => emp.pk_emp_id);
       document.getElementById(employeeRoleModal).showModal();
     }
-    catch(err){
+    catch (err) {
       console.log(err.message || err.response.data);
     }
   }
@@ -86,14 +87,15 @@ export const Employee = () => {
   }
 
   const onEmployeeRoleModalSubmit = async () => {
-    try{
-      const response = await axios.post(`${ApiEndPoints.addRolesToEmployee}${employeeId}`,roleId,{headers : {Authorization : localStorage.getItem("token"),"Content-Type" : "application/json"}});
+    try {
+      const response = await axios.post(`${ApiEndPoints.addRolesToEmployee}${employeeId}`, roleId, { headers: { Authorization: localStorage.getItem("token"), "Content-Type": "application/json" } });
       console.log(response.data);
+      toast.success("Role Added Sucessfully");
     }
-    catch(err){
-      console.log(err.message || err.response.data);
+    catch (err) {
+      toast.error(err.message || err.response.data);
     }
-    finally{
+    finally {
       setRoleId(0);
       setEmployeeId(0);
     }
@@ -114,10 +116,8 @@ export const Employee = () => {
 
   return (
     <div className='p-2 shadow-md mt-3 rounded-md w-full overflow-hidden'>
-      {Error && <Toast message={Error} />}
-      {Sucess && <ToastSucess message={Sucess} />}
       <Modal data={employeeData} title="New Employee" inputs={inputs} id={modalId} onchange={onChangeFunction} onsubmit={onSubmitFunction} />
-      <EmployeeRoleModal onchange={onEmployeeRoleModalChange} onsubmit={onEmployeeRoleModalSubmit} id={employeeRoleModal} employeeId={employeeId} roles={roles}/>
+      <EmployeeRoleModal onchange={onEmployeeRoleModalChange} onsubmit={onEmployeeRoleModalSubmit} id={employeeRoleModal} employeeId={employeeId} roles={roles} />
       <div className='w-full flex justify-between items-center'>
         <div><SearchInput /></div>
         <div className='flex justify-between items-center gap-2 bg-violet-100 text-blue-500 p-2 rounded-md cursor-pointer' onClick={() => document.getElementById(modalId).showModal()}>
@@ -145,7 +145,7 @@ export const Employee = () => {
                       <details className="dropdown dropdown-left relative">
                         <summary className="btn p-0 h-fit"><ClickSVG /></summary>
                         <ul className="menu dropdown-content bg-base-100 rounded-box absolute z-1 w-fit p-2 shadow-sm">
-                          <li><div onClick={()=>MapRolesToEmployee(emp)}>Assign Roles</div></li>
+                          <li><div onClick={() => MapRolesToEmployee(emp)}>Assign Roles</div></li>
                         </ul>
                       </details>
                     </td>

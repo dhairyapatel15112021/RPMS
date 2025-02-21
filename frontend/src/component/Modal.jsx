@@ -21,13 +21,17 @@ export const Modal = ({ onchange, data, onsubmit, id, title, inputs }) => {
                                             </div>
                                         </div>
                                         :
-                                        <input key={index} value={data?.[input.name]} type={input.type} className="input mb-2" placeholder={data?.[input.name] || input.placeholder} name={input.name} onChange={onchange} />
+                                        <fieldset className="fieldset">
+                                            <legend className="fieldset-legend">{input.placeholder}</legend>
+                                            <input key={index} type={input.type} className="input mb-0" placeholder={data?.[input.name] || input.placeholder} name={input.name} onChange={onchange} />
+                                        </fieldset>
+
                                 )
                             })
                         }
                         <form method="dialog">
-                            <button className="btn bg-violet-100 text-blue-400" onClick={onsubmit}>Submit</button>
-                            <button className='btn text-white ml-3 bg-red-400'>Cancel</button>
+                            <button className="btn bg-violet-100 text-blue-400 mt-2" onClick={onsubmit}>Submit</button>
+                            <button className='btn text-white ml-3 bg-red-400 mt-2'>Cancel</button>
                         </form>
                     </fieldset>
                 </div>

@@ -2,8 +2,6 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { ApiEndPoints } from '../../../data/ApiEndPoints';
 import { DeleteSVG } from '../../../component/DeleteSVG';
-import { Toast } from '../../../component/Toast/Toast';
-import { ToastSucess } from '../../../component/Toast/ToastSucess';
 import { Modal } from '../../../component/Modal';
 
 export const AddRole = () => {
@@ -12,7 +10,7 @@ export const AddRole = () => {
     const [Error, setError] = useState("");
     const [Sucess, setSucess] = useState("");
     const modalID = "role_modal";
-    const inputs = [{type : "text" , placeholder : "Role Type" , name : "role_type"}];
+    const inputs = [{ type: "text", placeholder: "Role Type", name: "role_type" }];
 
     const onChangeFunction = (event) => {
         setRoleData({ ...roleData, [event.target.name]: event.target.value });
@@ -31,18 +29,6 @@ export const AddRole = () => {
         }
         catch (err) {
             setError(err.message || err.response.message);
-            console.log(err);
-        }
-    }
-
-    const DeleteRoles = async (id) => {
-        try {
-            const response = await axios.delete(`${ApiEndPoints.deleteRoles}${id}`,{ headers: { Authorization: localStorage.getItem("token") } });
-            setSucess(response.data);
-            getRoles();
-        }
-        catch (err) {
-            setError(err.message || err.response.data);
             console.log(err);
         }
     }
@@ -74,9 +60,7 @@ export const AddRole = () => {
 
     return (
         <div className='p-2 mt-3 w-fit'>
-            {Error && <Toast message={Error} />}
-            {Sucess && <ToastSucess message={Sucess} />}
-            <Modal title="New Role" onchange={onChangeFunction} onsubmit={onSubmitFunction} id={modalID} inputs={inputs}  />
+            <Modal title="New Role" onchange={onChangeFunction} onsubmit={onSubmitFunction} id={modalID} inputs={inputs} />
             <div className='font-bold text-lg'>
                 Below Are Listed Roles
             </div>
@@ -96,7 +80,6 @@ export const AddRole = () => {
                                     <tr key={role.pk_role_id}>
                                         <th>{index + 1}</th>
                                         <td>{role.role_type}</td>
-                                        <td><button className="btn btn-error text-white" onClick={() => DeleteRoles(role.pk_role_id)}><DeleteSVG /></button></td>
                                     </tr>
                                 )
                             })

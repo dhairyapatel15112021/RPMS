@@ -1,25 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Toast } from '../component/Toast/Toast';
 import { ApiEndPoints } from '../data/ApiEndPoints';
 import { useDispatch } from 'react-redux';
 import { login } from '../store/Action';
+import toast from 'react-hot-toast';
 
 const Login = () => {
     const navigate = useNavigate();
     const [loginData, setLoginData] = useState({ email: "", password: "", is_candidate: false });
-    const [Error, setError] = useState("");
     const dispatch = useDispatch();
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (!Error) {
-                setError("");
-            }
-        }, 5000);
-        return () => clearInterval(interval);
-    }, []);
 
     const onChangeFunction = (event) => {
         if (event.target.type === "checkbox") {
@@ -31,11 +21,11 @@ const Login = () => {
 
     const submitForm = async () => {
         if (loginData.email.trim() === "") {
-            setError("Username Should Not Be Blank");
+            toast.error("Username Should Not be blank");
             return;
         }
         if (loginData.password.trim() === "") {
-            setError("Password Should Not be Blank");
+            toast.error("Password Should Not be blank")
             return;
         }
         try {
@@ -91,15 +81,14 @@ const Login = () => {
             navigate("/navigation");
         }
         catch (err) {
-            setError(err.message || err.response.data);
-            console.log(err);
+            toast.error(err.message || err.response.data);
         }
     }
 
     return (
         <div className='flex justify-center items-center h-[90vh] w-[100vw]'>
             <div className="flex flex-col justify-center items-center border rounded-md p-4">
-                {Error && <Toast message={Error} />}
+
                 <div className='tracking-wide text-3xl'>LOGIN</div>
                 <div className='flex flex-col mt-5 gap-5'>
                     <input onChange={onChangeFunction} type="text" name="email" placeholder="Email" className='border rounded-sm p-2 focus:outline-none' />

@@ -1,12 +1,13 @@
+using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.Services.InterviewScheduler;
 
 public interface IInterviewSchedulerService
 {
-    Task<InterviewSchedulerModel> scheduleInterview(InterviewSchedulerModel interviewScheduler);
+    Task<bool> scheduleInterview(InterviewScheduledto interviewdto);
 
-    Task<InterviewSchedulerModel> getScheduledInterview(int applicationId);
+    Task<InterviewScheduledto> getScheduledInterview(int applicationId,bool isHr);
 
     Task<InterviewSchedulerModel> getScheduledInterviewById(int interviewSchedulerId);
 }

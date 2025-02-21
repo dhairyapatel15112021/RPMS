@@ -6,19 +6,21 @@ import { ClickSVG } from '../../../component/Recruiter/ClickSVG';
 import axios from 'axios';
 import { ApiEndPoints } from '../../../data/ApiEndPoints';
 import { Modal } from '../../../component/Modal';
+import { InterviewScheduler } from './InterviewScheduler';
 
 export const ApplicationCandidateModal = ({ id, positionId }) => {
     const [applications, setApplications] = useState([]);
     const [isLoading, setLoading] = useState(true);
-    const [interscheduleData, setInterviewScheduleData] = useState({
-        "fk_application_id": 0,
-        "no_of_hr_round": 1,
-        "no_of_tech_round": 2,
-        "assesment_link": "",
-        "interview_link": "",
-        "interview_date": "",
-        "interview_time": ""
-    });
+    const [applicationId, setApplicationId] = useState(0);
+    // const [interscheduleData, setInterviewScheduleData] = useState({
+    //     "fk_application_id": 0,
+    //     "no_of_hr_round": 1,
+    //     "no_of_tech_round": 2,
+    //     "assesment_link": "",
+    //     "interview_link": "",
+    //     "interview_date": "",
+    //     "interview_time": ""
+    // });
     const columns = ["Name", "Email", "Date", "Status", ""];
     const applicationStatus = ["applied", "review", "interview", "completed", "hired", "on_hold"];
     const interviewScheduleModal = "interview_schedule_modal";
@@ -59,32 +61,9 @@ export const ApplicationCandidateModal = ({ id, positionId }) => {
         }
     }
 
-    const setInterviewSettings = async (applicationId) => {
-        try {
-            const response = await axios.get(`${ApiEndPoints.getInterviewScheduler}${applicationId}`, { headers: { Authorization: localStorage.getItem("token") } });
-            console.log(response.data);
-            if (response.data != null)
-                setInterviewScheduleData(() => response.data);
-            else
-                setInterviewScheduleData({ ...interscheduleData, "fk_application_id": applicationId });
-            document.getElementById(interviewScheduleModal).showModal();
-        }
-        catch (err) {
-            console.log(err.message || err.response.data);
-        }
-    }
-    const onChangeFunction = (event) => {
-        setInterviewScheduleData({ ...interscheduleData, [event.target.name]: event.target.value });
-    }
-
-    const submitInterviewScheduler = async () => {
-        try {
-            const response = await axios.post(`${ApiEndPoints.scheduleInterview}`, interscheduleData, { headers: { Authorization: localStorage.getItem("token") } });
-            console.log(response.data);
-        }
-        catch (err) {
-            console.log(err.message || err.response.data);
-        }
+    const setInterviewSettings = (applicationId) => {
+        setApplicationId(applicationId);
+        document.getElementById(interviewScheduleModal).showModal();
     }
 
     useEffect(() => {
@@ -93,7 +72,7 @@ export const ApplicationCandidateModal = ({ id, positionId }) => {
 
     return (
         <dialog id={id} className="modal w-full">
-            <Modal id={interviewScheduleModal} inputs={inputs} data={interscheduleData} title="Schedule Interview" onchange={onChangeFunction} onsubmit={submitInterviewScheduler} />
+            <InterviewScheduler applicationId={applicationId} id={interviewScheduleModal} />
             <div className="modal-box w-11/12 max-w-5xl pt-0">
                 <div className="modal-action">
                     {isLoading ? <Loader /> :
@@ -121,9 +100,8 @@ export const ApplicationCandidateModal = ({ id, positionId }) => {
                                                                     <ul className="menu dropdown-content bg-base-100 rounded-box absolute z-1 w-fit p-2 shadow-sm">
                                                                         <li><div onClick={() => setApplicationHoldSettings(item.application.pk_application_id)}>Hold</div></li>
                                                                         {
-                                                                            item.application.applicationStatus === 2 && <li><div onClick={() => setInterviewSettings(item.application.pk_application_id)}>Schedule Interview</div></li>
+                                                                            item.application.applicationStatus === 2 && ( item.interview != null && item.interview.length != 0 ?<li><div>Already Scheduled</div></li> : <li><div onClick={() => setInterviewSettings(item.application.pk_application_id)}>Schedule Interview</div></li> )
                                                                         }
-                                                                        {/* <li><div>like schedule interview etc</div></li> */}
                                                                     </ul>
                                                                 </details>
                                                             </td>

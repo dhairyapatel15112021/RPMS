@@ -9,6 +9,7 @@ import { Modal } from '../../../component/Modal';
 import { useSelector } from 'react-redux';
 import { ClickSVG } from '../../../component/Recruiter/ClickSVG';
 import { ClosePosition } from './ClosePosition';
+import { PositionCreateModal } from './PositionCreateModal';
 
 // validation while positin creation,updation,hold,close,reopen
 // error messages whith toast
@@ -39,6 +40,7 @@ export const Position = () => {
   const holdPositionInputs = [{ type: "text", name: "comments", placeholder: "Comments" }];
 
   const modalId = "position_modal";
+  const updateModalId = "update_modal_id";
   const modalHoldId = "position_hold_id";
   const modalCloseId = "position_close_id";
 
@@ -118,7 +120,7 @@ export const Position = () => {
   const setUpdateSettings = (position) => {
     setPositionData(() => position);
     setIsUpdate(() => true);
-    document.getElementById(modalId).showModal();
+    document.getElementById(updateModalId).showModal();
   }
 
   const setPatchSettings = (position) => {
@@ -134,8 +136,10 @@ export const Position = () => {
 
   return (
     <div className='p-2 shadow-md mt-3 rounded-md w-full overflow-hidden'>
-      <Modal onchange={onChangeFunction} onsubmit={onSubmitFunction} data={positionData} id={modalId} inputs={inputs} title={isUpdate ? "Update Position" : "Create New Position"} />
+      <Modal onchange={onChangeFunction} onsubmit={onSubmitFunction} data={positionData} id={updateModalId} inputs={inputs} title={"Update Position"} />
+      <PositionCreateModal id={modalId} getAllPostions={getAllPositions} />
       <Modal onsubmit={onPatchSubmitFunction} onchange={patchOnChange} id={modalHoldId} inputs={holdPositionInputs} title="Hold Position" />
+
       <ClosePosition positionId={positionId} onsubmit={onPatchSubmitFunction} onchange={patchOnChange} id={modalCloseId} title="Close Position" />
       <div className='w-full flex justify-between items-center'>
         <div><SearchInput /></div>
@@ -170,10 +174,15 @@ export const Position = () => {
                         <summary className="btn p-0 h-fit"><ClickSVG /></summary>
                         <ul className="menu dropdown-content bg-base-100 rounded-box absolute z-1 w-fit p-2 shadow-sm">
                           {
-                            item.is_open == 1 ? <li><div onClick={() => reopenPosition(item)}>Reopen</div></li> : <li><div onClick={() => setPatchSettings(item)}>Hold</div></li>
+                            item.is_open == 2 ? <li><div>Position Is Closed</div></li> : <>
+                              {
+                                item.is_open == 1 ? <li><div onClick={() => reopenPosition(item)}>Reopen</div></li> : <li><div onClick={() => setPatchSettings(item)}>Hold</div></li>
+                              }
+                              <li><div onClick={() => setClosePositionSettings(item)}>Close</div></li>
+                              <li><div onClick={() => setUpdateSettings(item)}>Update</div></li>
+                            </>
                           }
-                          <li><div onClick={() => setClosePositionSettings(item)}>Close</div></li>
-                          <li><div onClick={() => setUpdateSettings(item)}>Update</div></li>
+
 
                         </ul>
                       </details>

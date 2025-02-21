@@ -17,7 +17,7 @@ export const CandidateSection = () => {
     const [isLoading, setLoading] = useState(true);
     const [candidates, setCandidates] = useState([]);
     const modalId = "candidate_modal";
-    const columns = ["CandidateId", "Name", "Email", "Contact", "Applications", "Skills", "Experience", "Education", "CV", ""];
+    const columns = ["CandidateId", "Name", "Email", "Contact", "CV", ""];
 
     const onChangeFunction = (event) => {
         setCandidateData({ ...candidateData, [event.target.name]: event.target.value });
@@ -135,10 +135,6 @@ export const CandidateSection = () => {
                                         <td>{item.candidate_name}</td>
                                         <td>{item.candidate_email}</td>
                                         <td>{item.candidate_contact_number}</td>
-                                        <td><button className='btn'>Application</button></td>
-                                        <td><button className='btn'>Skills</button></td>
-                                        <td><button className='btn'>Experience</button></td>
-                                        <td><button className='btn'>Education</button></td>
                                         <td>{
                                             item.cv_path ?
                                                 <Link to={`http://localhost:5083${item.cv_path}`} target='_blank' className='flex justify-between items-center gap-2 w-fit bg-violet-100 text-blue-500 p-2 rounded-md cursor-pointer justify-self-center'>
@@ -153,7 +149,10 @@ export const CandidateSection = () => {
                                             <details className="dropdown dropdown-left relative">
                                                 <summary className="btn p-0 h-fit"><ClickSVG /></summary>
                                                 <ul className="menu dropdown-content bg-base-100 rounded-box absolute z-1 w-fit p-2 shadow-sm">
-                                                    <li>dummy</li>
+                                                    <li><div>Applications</div></li>
+                                                    <li> <div>Skills</div></li>
+                                                    <li> <div>Experience</div></li>
+                                                    <li><div>Education</div></li>
                                                 </ul>
                                             </details>
                                         </td>

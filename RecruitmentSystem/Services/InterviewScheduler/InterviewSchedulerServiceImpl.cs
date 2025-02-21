@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RecruitmentSystem.Data;
+using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.Services.InterviewScheduler;
@@ -13,9 +14,35 @@ public class InterviewSchedulerServiceImpl : IInterviewSchedulerService
         _context = context;
     }
 
-    public async Task<InterviewSchedulerModel> getScheduledInterview(int applicationId)
+    public async Task<InterviewScheduledto> getScheduledInterview(int applicationId, bool isHr)
     {
-        return await _context.InterviewSchedulers.FirstOrDefaultAsync(i => i.fk_application_id == applicationId);
+        try
+        {
+            var interviewScheduledDto = await _context.InterviewSchedulers
+                                        .Where(i => i.fk_application_id == applicationId)
+                                        .Select(i => new InterviewScheduledto
+                                        {
+                                            interview = i,
+                                            interview_rounds = i.CandidateInterview
+                                            .Where(ir => ir.interview_type == (isHr ? InterviewType.hr : InterviewType.tech))
+                                            .Select(ir => new CandidateInterviewModel
+                                            {
+                                                interview_date = ir.interview_date,
+                                                interview_link = ir.interview_link,
+                                                interview_time = ir.interview_time,
+                                                interview_type = ir.interview_type,
+                                                IsDone = ir.IsDone,
+                                            })
+                                            .ToList()
+                                    })
+                                    .FirstOrDefaultAsync();
+                return interviewScheduledDto;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return null;
+        }
     }
 
     public async Task<InterviewSchedulerModel> getScheduledInterviewById(int interviewSchedulerId)
@@ -23,23 +50,30 @@ public class InterviewSchedulerServiceImpl : IInterviewSchedulerService
         return await _context.InterviewSchedulers.FindAsync(interviewSchedulerId);
     }
 
-    public async Task<InterviewSchedulerModel> scheduleInterview(InterviewSchedulerModel interviewScheduler)
+    public async Task<bool> scheduleInterview(InterviewScheduledto interviewScheduledto)
     {
+        var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            InterviewSchedulerModel is_interview_scheduled = await getScheduledInterview(interviewScheduler.fk_application_id);
-            if (is_interview_scheduled != null)
-            {
-                return is_interview_scheduled;
-            }
-            await _context.InterviewSchedulers.AddAsync(interviewScheduler);
+            await _context.InterviewSchedulers.AddAsync(interviewScheduledto.interview);
             await _context.SaveChangesAsync();
-            return interviewScheduler;
+
+            int scheduler_id = interviewScheduledto.interview.pk_interview_scheduler_id;
+            foreach (CandidateInterviewModel c in interviewScheduledto.interview_rounds)
+            {
+                c.fk_interview_scheduler_id = scheduler_id;
+            }
+            await _context.Interviews.AddRangeAsync(interviewScheduledto.interview_rounds);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return true;
         }
         catch (Exception ex)
         {
+            await transaction.RollbackAsync();
             Console.WriteLine(ex.Message);
-            return null;
+            return false;
         }
 
     }

@@ -13,6 +13,7 @@ export const ApplicationInterviewModal = ({ empId, id, positionId, setPositionId
     const [isLoading, setLoading] = useState(true);
     const columns = ["Name", "Email", "Date", "Status", "CV", ""];
     const applicationStatus = ["applied", "review", "interview", "completed", "hired", "on_hold"];
+    const [interviews,setInterviews] = useState([]);
     const getApplications = async () => {
         try {
             if (positionId === 0) {
@@ -42,6 +43,16 @@ export const ApplicationInterviewModal = ({ empId, id, positionId, setPositionId
             getApplications();
         }
         catch (err) {
+            console.log(err.message || err.response.data);
+        }
+    }
+
+    const getScheduledInterview = async (applicationId) => {
+        try{
+            const response = await axios.get(`${ApiEndPoints.getInterviewScheduler}${applicationId}?isHr=false`,{headers : {Authorization : localStorage.getItem("token")}});
+            setInterviews(response.data);
+        }
+        catch(err){
             console.log(err.message || err.response.data);
         }
     }
@@ -89,7 +100,8 @@ export const ApplicationInterviewModal = ({ empId, id, positionId, setPositionId
                                                                 <details className="dropdown dropdown-left relative">
                                                                     <summary className="btn p-0 h-fit"><ClickSVG /></summary>
                                                                     <ul className="menu dropdown-content bg-base-100 rounded-box absolute z-1 w-fit p-2 shadow-sm">
-                                                                        <li><div>Interview Round</div></li>
+                                                                        {/* <li> check if interview exist or not</li> */}
+                                                                        <li><div onClick={()=> getScheduledInterview(item.application.pk_application_id)}>Interview Round</div></li>
                                                                         <li><div onClick={() => setCompletedStageSettings(item.application.pk_application_id)}>Select</div></li>
                                                                     </ul>
                                                                 </details>
