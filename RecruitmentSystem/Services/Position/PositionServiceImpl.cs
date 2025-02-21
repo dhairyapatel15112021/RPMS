@@ -6,33 +6,61 @@ using RecruitmentSystem.Data;
 using RecruitmentSystem.dto;
 using RecruitmentSystem.Models;
 using RecruitmentSystem.Services.Position;
+using RecruitmentSystem.Services.PositionSkill;
 
 namespace RecruitmentSystem.Controllers.Services;
 
 public class PositionServiceImpl : IPositionService
 {
     private ApplicationDbContext _context;
+    private readonly IPositionSkillService positionSkillService;
 
-    public PositionServiceImpl(ApplicationDbContext context)
+    public PositionServiceImpl(ApplicationDbContext context, IPositionSkillService positionSkillService)
     {
         _context = context;
+        this.positionSkillService = positionSkillService;
     }
-    public async Task<Boolean> createOpening(PositionModel position)
+    public async Task<Boolean> createOpening(PositionCreatedto position)
     {
+        var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            await _context.Position.AddAsync(position);
+            PositionModel is_exist = await getPosition(position.position.position_title);
+            if (is_exist != null)
+            {
+                throw new Exception("Already Position Exist with this title");
+            }
+            await _context.Position.AddAsync(position.position);
             await _context.SaveChangesAsync();
+            int positionId = position.position.pk_position_id;
+            Console.WriteLine("hi -2 ");
+            position.skills.positionId = positionId;
+            Console.WriteLine(positionId);
+            Console.WriteLine("hi -2 ");
+            Console.WriteLine(position.skills.minimumSkill);
+            Console.WriteLine(position.skills.preferedSkill);
+            Console.WriteLine(position.skills.positionId);
+            bool is_saved = await positionSkillService.addSkillToWhilePositionCreation(position.skills);
+            if (!is_saved)
+            {
+                throw new Exception("Something went wrong");
+            }
+            await transaction.CommitAsync();
             return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
+            await transaction.RollbackAsync();
             return false;
         }
 
     }
 
+    public async Task<PositionModel> getPosition(string position_title)
+    {
+        return await _context.Position.FirstOrDefaultAsync(p => p.position_title == position_title);
+    }
 
     public async Task<PositionModel> getPosition(int positionId)
     {
@@ -204,7 +232,7 @@ public class PositionServiceImpl : IPositionService
                 dto.pk_position_id = r.pk_position_id;
                 dto.position_title = r.position_title;
                 dto.position_description = r.position_description;
-                dto.position_min_experience =  r.position_min_experience;
+                dto.position_min_experience = r.position_min_experience;
                 dto.is_open = r.is_open;
                 dto.comments = r.comments;
                 dto.position_level = r.position_level;

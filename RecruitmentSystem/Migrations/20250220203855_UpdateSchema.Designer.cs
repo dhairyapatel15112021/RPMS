@@ -12,8 +12,8 @@ using RecruitmentSystem.Data;
 namespace RecruitmentSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250211061203_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250220203855_UpdateSchema")]
+    partial class UpdateSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,71 @@ namespace RecruitmentSystem.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("CandidateEducation", b =>
+                {
+                    b.Property<int>("pk_candidate_education_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_candidate_education_id"));
+
+                    b.Property<int>("fk_candidate_id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("institute_name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("passing_year")
+                        .HasColumnType("int");
+
+                    b.Property<double>("percentage_score")
+                        .HasColumnType("float");
+
+                    b.Property<string>("qualification_type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("pk_candidate_education_id");
+
+                    b.HasIndex("fk_candidate_id");
+
+                    b.ToTable("CandidateEducation");
+                });
+
+            modelBuilder.Entity("CandidateExperience", b =>
+                {
+                    b.Property<int>("pk_candidate_experience")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_candidate_experience"));
+
+                    b.Property<string>("company_name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("fk_candidate_id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("job_profile")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("job_responsibility")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("no_of_years")
+                        .HasColumnType("int");
+
+                    b.HasKey("pk_candidate_experience");
+
+                    b.HasIndex("fk_candidate_id");
+
+                    b.ToTable("CandidateExperiences");
+                });
 
             modelBuilder.Entity("RecruitmentSystem.Models.ApplicationModel", b =>
                 {
@@ -57,7 +122,55 @@ namespace RecruitmentSystem.Migrations
 
                     b.HasIndex("fk_position_id");
 
-                    b.ToTable("Applications");
+                    b.ToTable("Applications", t =>
+                        {
+                            t.HasTrigger("application_status");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.CandidateInterviewModel", b =>
+                {
+                    b.Property<int>("pk_interview_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_interview_id"));
+
+                    b.Property<int>("Index")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDone")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("fk_interview_scheduler_id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("interview_date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("interview_link")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<TimeSpan>("interview_time")
+                        .HasColumnType("time");
+
+                    b.Property<int>("interview_type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("round_number")
+                        .HasColumnType("int");
+
+                    b.HasKey("pk_interview_id");
+
+                    b.HasIndex("fk_interview_scheduler_id");
+
+                    b.ToTable("Interviews");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.CandidateModel", b =>
@@ -87,6 +200,9 @@ namespace RecruitmentSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("cv_path")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -94,6 +210,31 @@ namespace RecruitmentSystem.Migrations
                     b.HasKey("pk_candidate_id");
 
                     b.ToTable("Candidate");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.CandidateSkillModel", b =>
+                {
+                    b.Property<int>("pk_candidate_skill_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_candidate_skill_id"));
+
+                    b.Property<int>("fk_candidate_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("skill_experience")
+                        .HasColumnType("int");
+
+                    b.Property<string>("skill_name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("pk_candidate_skill_id");
+
+                    b.HasIndex("fk_candidate_id");
+
+                    b.ToTable("CandidateSkill");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.DocuementModel", b =>
@@ -195,6 +336,41 @@ namespace RecruitmentSystem.Migrations
                     b.ToTable("Employees");
                 });
 
+            modelBuilder.Entity("RecruitmentSystem.Models.InterviewFeedbackModel", b =>
+                {
+                    b.Property<int>("pk_interview_feedback_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_interview_feedback_id"));
+
+                    b.Property<string>("comments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("fk_emp_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("fk_interview_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("fk_position_skill_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ratings")
+                        .HasColumnType("int");
+
+                    b.HasKey("pk_interview_feedback_id");
+
+                    b.HasIndex("fk_emp_id");
+
+                    b.HasIndex("fk_interview_id");
+
+                    b.HasIndex("fk_position_skill_id");
+
+                    b.ToTable("InterviewFeedbacks");
+                });
+
             modelBuilder.Entity("RecruitmentSystem.Models.InterviewPanelModel", b =>
                 {
                     b.Property<int>("pk_interview_panel_id")
@@ -216,6 +392,33 @@ namespace RecruitmentSystem.Migrations
                     b.HasIndex("fk_position_interview_id");
 
                     b.ToTable("InterviewPanels");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.InterviewSchedulerModel", b =>
+                {
+                    b.Property<int>("pk_interview_scheduler_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_interview_scheduler_id"));
+
+                    b.Property<string>("assesment_link")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("fk_application_id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("no_of_hr_round")
+                        .HasColumnType("int");
+
+                    b.Property<int>("no_of_tech_round")
+                        .HasColumnType("int");
+
+                    b.HasKey("pk_interview_scheduler_id");
+
+                    b.HasIndex("fk_application_id");
+
+                    b.ToTable("InterviewSchedulers");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.PositionModel", b =>
@@ -293,6 +496,9 @@ namespace RecruitmentSystem.Migrations
                     b.Property<int>("fk_skills_id")
                         .HasColumnType("int");
 
+                    b.Property<bool>("is_min_req_skills")
+                        .HasColumnType("bit");
+
                     b.HasKey("pk_position_skill_id");
 
                     b.HasIndex("fk_position_id");
@@ -309,6 +515,10 @@ namespace RecruitmentSystem.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_review_id"));
+
+                    b.Property<string>("comments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("fk_application_id")
                         .HasColumnType("int");
@@ -376,9 +586,6 @@ namespace RecruitmentSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("pk_skills_id"));
 
-                    b.Property<bool>("is_min_req_skills")
-                        .HasColumnType("bit");
-
                     b.Property<string>("skills_description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -390,6 +597,28 @@ namespace RecruitmentSystem.Migrations
                     b.HasKey("pk_skills_id");
 
                     b.ToTable("Skills");
+                });
+
+            modelBuilder.Entity("CandidateEducation", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.CandidateModel", "candidate")
+                        .WithMany("Education")
+                        .HasForeignKey("fk_candidate_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("candidate");
+                });
+
+            modelBuilder.Entity("CandidateExperience", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.CandidateModel", "candidate")
+                        .WithMany("Experience")
+                        .HasForeignKey("fk_candidate_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("candidate");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.ApplicationModel", b =>
@@ -409,6 +638,28 @@ namespace RecruitmentSystem.Migrations
                     b.Navigation("candidate");
 
                     b.Navigation("position");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.CandidateInterviewModel", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.InterviewSchedulerModel", "InterviewScheduler")
+                        .WithMany("CandidateInterview")
+                        .HasForeignKey("fk_interview_scheduler_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InterviewScheduler");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.CandidateSkillModel", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.CandidateModel", "candidate")
+                        .WithMany("Skills")
+                        .HasForeignKey("fk_candidate_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("candidate");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.DocuementModel", b =>
@@ -445,6 +696,33 @@ namespace RecruitmentSystem.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("RecruitmentSystem.Models.InterviewFeedbackModel", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.EmployeesModel", "Employees")
+                        .WithMany("InterviewFeedbacks")
+                        .HasForeignKey("fk_emp_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("RecruitmentSystem.Models.CandidateInterviewModel", "Intervies")
+                        .WithMany("InterviewFeedbacks")
+                        .HasForeignKey("fk_interview_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("RecruitmentSystem.Models.PositionSkillMapModel", "PositionSkill")
+                        .WithMany("InterviewFeedbacks")
+                        .HasForeignKey("fk_position_skill_id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Employees");
+
+                    b.Navigation("Intervies");
+
+                    b.Navigation("PositionSkill");
+                });
+
             modelBuilder.Entity("RecruitmentSystem.Models.InterviewPanelModel", b =>
                 {
                     b.HasOne("RecruitmentSystem.Models.EmployeesModel", "employees")
@@ -462,6 +740,17 @@ namespace RecruitmentSystem.Migrations
                     b.Navigation("employees");
 
                     b.Navigation("position");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.InterviewSchedulerModel", b =>
+                {
+                    b.HasOne("RecruitmentSystem.Models.ApplicationModel", "application")
+                        .WithMany("InterviewSchedulers")
+                        .HasForeignKey("fk_application_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("application");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.PositionModel", b =>
@@ -540,7 +829,14 @@ namespace RecruitmentSystem.Migrations
 
             modelBuilder.Entity("RecruitmentSystem.Models.ApplicationModel", b =>
                 {
+                    b.Navigation("InterviewSchedulers");
+
                     b.Navigation("ReviewFeedbacks");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.CandidateInterviewModel", b =>
+                {
+                    b.Navigation("InterviewFeedbacks");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.CandidateModel", b =>
@@ -549,12 +845,20 @@ namespace RecruitmentSystem.Migrations
 
                     b.Navigation("Document");
 
+                    b.Navigation("Education");
+
+                    b.Navigation("Experience");
+
                     b.Navigation("Position");
+
+                    b.Navigation("Skills");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.EmployeesModel", b =>
                 {
                     b.Navigation("Document");
+
+                    b.Navigation("InterviewFeedbacks");
 
                     b.Navigation("Interviews");
 
@@ -567,6 +871,11 @@ namespace RecruitmentSystem.Migrations
                     b.Navigation("positions");
                 });
 
+            modelBuilder.Entity("RecruitmentSystem.Models.InterviewSchedulerModel", b =>
+                {
+                    b.Navigation("CandidateInterview");
+                });
+
             modelBuilder.Entity("RecruitmentSystem.Models.PositionModel", b =>
                 {
                     b.Navigation("Applications");
@@ -576,6 +885,11 @@ namespace RecruitmentSystem.Migrations
                     b.Navigation("PositionSkill");
 
                     b.Navigation("Reviews");
+                });
+
+            modelBuilder.Entity("RecruitmentSystem.Models.PositionSkillMapModel", b =>
+                {
+                    b.Navigation("InterviewFeedbacks");
                 });
 
             modelBuilder.Entity("RecruitmentSystem.Models.RoleModel", b =>

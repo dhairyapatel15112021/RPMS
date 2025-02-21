@@ -9,7 +9,6 @@ public interface IInterviewPanelService
 
     Task<InterviewPanelModel> getInterviwer(int empId, int positionId);
 
-    Task<bool> removeInterviwer(int interviwerId);
 
     Task<InterviewPanelModel> getInterviwerById(int interviwerId);
 

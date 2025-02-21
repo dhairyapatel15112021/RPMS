@@ -9,7 +9,6 @@ public interface IReviewPanelSerivce
 
     Task<ReviewerPanelModel> getReviewer(int empId, int positionId);
 
-    Task<bool> removeReviewer(int reviwerId);
 
     Task<ReviewerPanelModel> getReviewerById(int reviwerId);
 

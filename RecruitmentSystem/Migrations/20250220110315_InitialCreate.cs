@@ -21,6 +21,7 @@ namespace RecruitmentSystem.Migrations
                     candidate_contact_number = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     candidate_email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     candidate_password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    cv_path = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     candidate_linkdien = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     role = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -67,12 +68,75 @@ namespace RecruitmentSystem.Migrations
                     pk_skills_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     skills_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    skills_description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    is_min_req_skills = table.Column<bool>(type: "bit", nullable: false)
+                    skills_description = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Skills", x => x.pk_skills_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CandidateEducation",
+                columns: table => new
+                {
+                    pk_candidate_education_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    institute_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    qualification_type = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    passing_year = table.Column<int>(type: "int", nullable: false),
+                    percentage_score = table.Column<double>(type: "float", nullable: false),
+                    fk_candidate_id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CandidateEducation", x => x.pk_candidate_education_id);
+                    table.ForeignKey(
+                        name: "FK_CandidateEducation_Candidate_fk_candidate_id",
+                        column: x => x.fk_candidate_id,
+                        principalTable: "Candidate",
+                        principalColumn: "pk_candidate_id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CandidateExperiences",
+                columns: table => new
+                {
+                    pk_candidate_experience = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    company_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    no_of_years = table.Column<int>(type: "int", nullable: false),
+                    job_profile = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    job_responsibility = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    fk_candidate_id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CandidateExperiences", x => x.pk_candidate_experience);
+                    table.ForeignKey(
+                        name: "FK_CandidateExperiences_Candidate_fk_candidate_id",
+                        column: x => x.fk_candidate_id,
+                        principalTable: "Candidate",
+                        principalColumn: "pk_candidate_id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CandidateSkill",
+                columns: table => new
+                {
+                    pk_candidate_skill_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    skill_name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    skill_experience = table.Column<int>(type: "int", nullable: false),
+                    fk_candidate_id = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CandidateSkill", x => x.pk_candidate_skill_id);
+                    table.ForeignKey(
+                        name: "FK_CandidateSkill_Candidate_fk_candidate_id",
+                        column: x => x.fk_candidate_id,
+                        principalTable: "Candidate",
+                        principalColumn: "pk_candidate_id");
                 });
 
             migrationBuilder.CreateTable(
@@ -226,7 +290,8 @@ namespace RecruitmentSystem.Migrations
                     pk_position_skill_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     fk_position_id = table.Column<int>(type: "int", nullable: false),
-                    fk_skills_id = table.Column<int>(type: "int", nullable: false)
+                    fk_skills_id = table.Column<int>(type: "int", nullable: false),
+                    is_min_req_skills = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -271,13 +336,37 @@ namespace RecruitmentSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InterviewSchedulers",
+                columns: table => new
+                {
+                    pk_interview_scheduler_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    fk_application_id = table.Column<int>(type: "int", nullable: false),
+                    no_of_hr_round = table.Column<int>(type: "int", nullable: false),
+                    no_of_tech_round = table.Column<int>(type: "int", nullable: false),
+                    assesment_link = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    interview_link = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InterviewSchedulers", x => x.pk_interview_scheduler_id);
+                    table.ForeignKey(
+                        name: "FK_InterviewSchedulers_Applications_fk_application_id",
+                        column: x => x.fk_application_id,
+                        principalTable: "Applications",
+                        principalColumn: "pk_application_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ReviewFeedbacks",
                 columns: table => new
                 {
                     pk_review_id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     fk_application_id = table.Column<int>(type: "int", nullable: false),
-                    fk_emp_id = table.Column<int>(type: "int", nullable: false)
+                    fk_emp_id = table.Column<int>(type: "int", nullable: false),
+                    comments = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -294,6 +383,64 @@ namespace RecruitmentSystem.Migrations
                         principalColumn: "pk_emp_id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Interviews",
+                columns: table => new
+                {
+                    pk_interview_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    fk_interview_scheduler_id = table.Column<int>(type: "int", nullable: false),
+                    remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    round_number = table.Column<int>(type: "int", nullable: false),
+                    interview_type = table.Column<int>(type: "int", nullable: false),
+                    IsDone = table.Column<bool>(type: "bit", nullable: false),
+                    Index = table.Column<int>(type: "int", nullable: false),
+                    interview_date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    interview_time = table.Column<TimeSpan>(type: "time", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Interviews", x => x.pk_interview_id);
+                    table.ForeignKey(
+                        name: "FK_Interviews_InterviewSchedulers_fk_interview_scheduler_id",
+                        column: x => x.fk_interview_scheduler_id,
+                        principalTable: "InterviewSchedulers",
+                        principalColumn: "pk_interview_scheduler_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InterviewFeedbacks",
+                columns: table => new
+                {
+                    pk_interview_feedback_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    fk_emp_id = table.Column<int>(type: "int", nullable: false),
+                    comments = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    fk_interview_id = table.Column<int>(type: "int", nullable: false),
+                    fk_position_skill_id = table.Column<int>(type: "int", nullable: false),
+                    ratings = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InterviewFeedbacks", x => x.pk_interview_feedback_id);
+                    table.ForeignKey(
+                        name: "FK_InterviewFeedbacks_Employees_fk_emp_id",
+                        column: x => x.fk_emp_id,
+                        principalTable: "Employees",
+                        principalColumn: "pk_emp_id");
+                    table.ForeignKey(
+                        name: "FK_InterviewFeedbacks_Interviews_fk_interview_id",
+                        column: x => x.fk_interview_id,
+                        principalTable: "Interviews",
+                        principalColumn: "pk_interview_id");
+                    table.ForeignKey(
+                        name: "FK_InterviewFeedbacks_PositionSkillMap_fk_position_skill_id",
+                        column: x => x.fk_position_skill_id,
+                        principalTable: "PositionSkillMap",
+                        principalColumn: "pk_position_skill_id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Applications_fk_candidate_id",
                 table: "Applications",
@@ -303,6 +450,21 @@ namespace RecruitmentSystem.Migrations
                 name: "IX_Applications_fk_position_id",
                 table: "Applications",
                 column: "fk_position_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CandidateEducation_fk_candidate_id",
+                table: "CandidateEducation",
+                column: "fk_candidate_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CandidateExperiences_fk_candidate_id",
+                table: "CandidateExperiences",
+                column: "fk_candidate_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CandidateSkill_fk_candidate_id",
+                table: "CandidateSkill",
+                column: "fk_candidate_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Docuements_fk_candidate_id",
@@ -315,6 +477,21 @@ namespace RecruitmentSystem.Migrations
                 column: "fk_emp_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InterviewFeedbacks_fk_emp_id",
+                table: "InterviewFeedbacks",
+                column: "fk_emp_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InterviewFeedbacks_fk_interview_id",
+                table: "InterviewFeedbacks",
+                column: "fk_interview_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InterviewFeedbacks_fk_position_skill_id",
+                table: "InterviewFeedbacks",
+                column: "fk_position_skill_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InterviewPanels_fk_emp_interview_id",
                 table: "InterviewPanels",
                 column: "fk_emp_interview_id");
@@ -323,6 +500,16 @@ namespace RecruitmentSystem.Migrations
                 name: "IX_InterviewPanels_fk_position_interview_id",
                 table: "InterviewPanels",
                 column: "fk_position_interview_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Interviews_fk_interview_scheduler_id",
+                table: "Interviews",
+                column: "fk_interview_scheduler_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InterviewSchedulers_fk_application_id",
+                table: "InterviewSchedulers",
+                column: "fk_application_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Position_fk_candidate_key",
@@ -381,13 +568,22 @@ namespace RecruitmentSystem.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "CandidateEducation");
+
+            migrationBuilder.DropTable(
+                name: "CandidateExperiences");
+
+            migrationBuilder.DropTable(
+                name: "CandidateSkill");
+
+            migrationBuilder.DropTable(
                 name: "Docuements");
 
             migrationBuilder.DropTable(
-                name: "InterviewPanels");
+                name: "InterviewFeedbacks");
 
             migrationBuilder.DropTable(
-                name: "PositionSkillMap");
+                name: "InterviewPanels");
 
             migrationBuilder.DropTable(
                 name: "ReviewerPanels");
@@ -399,13 +595,22 @@ namespace RecruitmentSystem.Migrations
                 name: "RolesMap");
 
             migrationBuilder.DropTable(
+                name: "Interviews");
+
+            migrationBuilder.DropTable(
+                name: "PositionSkillMap");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "InterviewSchedulers");
+
+            migrationBuilder.DropTable(
                 name: "Skills");
 
             migrationBuilder.DropTable(
                 name: "Applications");
-
-            migrationBuilder.DropTable(
-                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Position");

@@ -21,4 +21,6 @@ public class PositionSkillMapModel{
     public PositionModel? Position {get;set;}
 
     public SkillsModel? Skills {get;set;}
+
+    public ICollection<InterviewFeedbackModel>? InterviewFeedbacks {get;set;}
 }

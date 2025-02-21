@@ -29,12 +29,13 @@ public class PositionController : ControllerBase
     }
 
     [HttpPost("create")]
-    public async Task<ActionResult> createOpening([FromBody] PositionModel position)
+    [Authorize(Roles = "admin,recruiter")]
+    public async Task<ActionResult> createOpening([FromBody] PositionCreatedto positionCreate)
     {
         try
         {
             // validatation left
-            Boolean is_saved = await positionService.createOpening(position);
+            Boolean is_saved = await positionService.createOpening(positionCreate);
             if (is_saved)
             {
                 return Ok("Position Created");
@@ -239,27 +240,6 @@ public class PositionController : ControllerBase
         }
     }
 
-    [HttpDelete("reviewer/remove/{reviewId}")]
-    public async Task<ActionResult> removeReviwer(int reviewId)
-    {
-        try
-        {
-            if (reviewId == 0)
-            {
-                return BadRequest("Please Enter Valid Data");
-            }
-            bool is_removed = await reviewPanelSerivce.removeReviewer(reviewId);
-            if (!is_removed)
-            {
-                return BadRequest("Not Removed");
-            }
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
 
     [HttpGet("get/reviewe/{employeeId}")]
     [Authorize(Roles = "admin,Reviewer")]
@@ -333,28 +313,6 @@ public class PositionController : ControllerBase
             if (!is_assigned)
             {
                 return BadRequest("Not Saved");
-            }
-            return NoContent();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
-
-    [HttpDelete("interviwer/remove/{interviwerId}")]
-    public async Task<ActionResult> removeInterviwer(int interviwerId)
-    {
-        try
-        {
-            if (interviwerId == 0)
-            {
-                return BadRequest("Please Enter Valid Data");
-            }
-            bool is_removed = await interviewPanelService.removeInterviwer(interviwerId);
-            if (!is_removed)
-            {
-                return BadRequest("Not Removed");
             }
             return NoContent();
         }

@@ -33,7 +33,7 @@ public class CandidateServiceImpl : ICandidateService
                 candidate.candidate_email = dataEntry["email"];
                 candidate.candidate_contact_number = dataEntry["contact"];
                 candidate.candidate_name = dataEntry["name"];
-                candidate.candidate_password = dataEntry["password"];
+                candidate.candidate_password = BCrypt.Net.BCrypt.HashPassword(dataEntry["password"]);
                 allCandidates.Add(candidate);
             }
 

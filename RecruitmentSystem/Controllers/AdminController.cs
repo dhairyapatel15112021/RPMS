@@ -7,7 +7,6 @@ using RecruitmentSystem.Services.RoleMap;
 
 namespace RecruitmentSystem.Controllers;
 
-// remove method for removing roles
 
 [ApiController]
 [Route("api/admin")]
@@ -41,26 +40,6 @@ public class AdminController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
-    [HttpDelete("role/remove/{roleId}")]
-    [Authorize(Roles = "admin")]
-    public async Task<ActionResult> removeRoles(int roleId)
-    {
-        try
-        {
-            bool is_deleted = await roleService.removeRoles(roleId);
-            if (is_deleted)
-            {
-                return Ok("Delete Role");
-            }
-            return BadRequest("Something Went Wrong");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
-
 
     [HttpPost]
     [Route("role/employee/map/{id}")]

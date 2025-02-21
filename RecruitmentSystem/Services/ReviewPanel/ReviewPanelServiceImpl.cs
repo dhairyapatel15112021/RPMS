@@ -108,25 +108,6 @@ public class ReviewPanelServiceImpl : IReviewPanelSerivce
         }
     }
 
-    public async Task<bool> removeReviewer(int reviwerId)
-    {
-        try
-        {
-            ReviewerPanelModel is_reviewer_panel = await getReviewerById(reviwerId);
-            if (is_reviewer_panel == null)
-            {
-                throw new Exception("Reviewer Not Exist");
-            }
-            await _context.ReviewerPanels.Where(r => r.pk_reviwer_panel_id == reviwerId).ExecuteDeleteAsync();
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return false;
-        }
-    }
 
 
 }

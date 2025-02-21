@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using DocumentFormat.OpenXml.ExtendedProperties;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Crypto.Digests;
 using RecruitmentSystem.Models;
 
 namespace RecruitmentSystem.Data
@@ -24,6 +25,10 @@ namespace RecruitmentSystem.Data
         public DbSet<InterviewSchedulerModel> InterviewSchedulers { get; set; }
         public DbSet<CandidateInterviewModel> Interviews { get; set; }
         public DbSet<InterviewFeedbackModel> InterviewFeedbacks { get; set; }
+        public DbSet<CandidateSkillModel> CandidateSkill { get; set; }
+
+        public DbSet<CandidateEducation> CandidateEducation { get; set; }
+        public DbSet<CandidateExperience> CandidateExperiences { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,6 +49,9 @@ namespace RecruitmentSystem.Data
             modelBuilder.Entity<InterviewSchedulerModel>().HasKey(m => m.pk_interview_scheduler_id);
             modelBuilder.Entity<CandidateInterviewModel>().HasKey(m => m.pk_interview_id);
             modelBuilder.Entity<InterviewFeedbackModel>().HasKey(m => m.pk_interview_feedback_id);
+            modelBuilder.Entity<CandidateSkillModel>().HasKey(m => m.pk_candidate_skill_id);
+            modelBuilder.Entity<CandidateEducation>().HasKey(m => m.pk_candidate_education_id);
+            modelBuilder.Entity<CandidateExperience>().HasKey(m => m.pk_candidate_experience);
 
             // trigger
             modelBuilder.Entity<ApplicationModel>().ToTable(tb => tb.HasTrigger("application_status"));
@@ -320,6 +328,61 @@ namespace RecruitmentSystem.Data
             .OnDelete(DeleteBehavior.NoAction)
             .IsRequired();
 
+            // interview feedback and position skill map
+            modelBuilder.Entity<PositionSkillMapModel>()
+            .HasMany(ps => ps.InterviewFeedbacks)
+            .WithOne(itf => itf.PositionSkill)
+            .HasForeignKey(itf => itf.fk_position_skill_id)
+            .HasPrincipalKey(ps => ps.pk_position_skill_id);
+
+            modelBuilder.Entity<InterviewFeedbackModel>()
+            .HasOne(itf => itf.PositionSkill)
+            .WithMany(ps => ps.InterviewFeedbacks)
+            .HasForeignKey(itf => itf.fk_position_skill_id)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired();
+
+            // candidate skills and candidate
+            modelBuilder.Entity<CandidateModel>()
+            .HasMany(c => c.Skills)
+            .WithOne(cs => cs.candidate)
+            .HasForeignKey(cs => cs.fk_candidate_id)
+            .HasPrincipalKey(c => c.pk_candidate_id);
+
+            modelBuilder.Entity<CandidateSkillModel>()
+            .HasOne(cs => cs.candidate)
+            .WithMany(c => c.Skills)
+            .HasForeignKey(cs => cs.fk_candidate_id)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired();
+
+            // candidate education and candidate
+            modelBuilder.Entity<CandidateModel>()
+            .HasMany(c => c.Education)
+            .WithOne(e => e.candidate)
+            .HasForeignKey(e => e.fk_candidate_id)
+            .HasPrincipalKey(c => c.pk_candidate_id);
+
+            modelBuilder.Entity<CandidateEducation>()
+            .HasOne(e => e.candidate)
+            .WithMany(c => c.Education)
+            .HasForeignKey(e => e.fk_candidate_id)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired();
+
+            // candidate experience and candidate
+               modelBuilder.Entity<CandidateModel>()
+            .HasMany(c => c.Experience)
+            .WithOne(e => e.candidate)
+            .HasForeignKey(e => e.fk_candidate_id)
+            .HasPrincipalKey(c => c.pk_candidate_id);
+
+            modelBuilder.Entity<CandidateExperience>()
+            .HasOne(e => e.candidate)
+            .WithMany(c => c.Experience)
+            .HasForeignKey(e => e.fk_candidate_id)
+            .OnDelete(DeleteBehavior.NoAction)
+            .IsRequired();
         }
 
     }

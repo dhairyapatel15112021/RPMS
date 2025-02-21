@@ -23,15 +23,6 @@ public class InterviewSchedulerModel
 
     public string? assesment_link { get; set; }
 
-    [Required]
-    public string interview_link { get; set; }
-
-    [Required]
-    public DateTime interview_date { get; set; }
-
-    [Required]
-    public TimeSpan interview_time { get; set; }
-
     public ApplicationModel? application { get; set; }
 
     public ICollection<CandidateInterviewModel>? CandidateInterview { get; set; }

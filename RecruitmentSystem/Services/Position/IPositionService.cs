@@ -7,7 +7,7 @@ namespace RecruitmentSystem.Services.Position;
 public interface IPositionService
 {
 
-    Task<Boolean> createOpening(PositionModel position);
+    Task<Boolean> createOpening(PositionCreatedto position);
     Task<bool> holdOpening(int positionId, JsonPatchDocument<HoldPostion> holdPosition);
     Task<bool> closeOpening(int positionId, JsonPatchDocument<ClosePostion> closePosition);
     Task<bool> openOpening(int positionId);
@@ -16,4 +16,5 @@ public interface IPositionService
     Task<List<PositionDTO>> getAllOpenings();
     Task<List<PositionDTO>> getAllOpenOpenings();
     Task<PositionModel> getPosition(int positionId);
+    Task<PositionModel> getPosition(string position_title);
 }

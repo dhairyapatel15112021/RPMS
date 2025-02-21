@@ -20,8 +20,20 @@ public class CandidateInterviewModel
     [Required]
     public InterviewType interview_type { get; set; }
 
+    [Required]
+    public string interview_link {get;set;}
+
+    [Required]
     public bool IsDone { get; set; }
+
+    [Required]
     public int Index { get; set; }
+
+    [Required]
+    public DateTime interview_date { get; set; }
+
+    [Required]
+    public TimeSpan interview_time { get; set; }
 
     public InterviewSchedulerModel? InterviewScheduler { get; set; }
 

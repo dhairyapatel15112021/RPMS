@@ -38,11 +38,13 @@ public class ApplicationController : ControllerBase
             {
                 throw new Exception("Please Enter Proper Data");
             }
+            Console.WriteLine("hi-1");
             bool is_applied = await applicationService.applyApplication(ids, positionId);
             if (!is_applied)
             {
                 return BadRequest("Application Failed");
             }
+            Console.WriteLine("hi-2");
             return Ok("Applied Succesfully");
         }
         catch (Exception ex)
@@ -145,11 +147,12 @@ public class ApplicationController : ControllerBase
     }
 
     [HttpPatch("change/{applicationId}")]
-    [Authorize(Roles = "Reviewer,admin")]
+    [Authorize(Roles = "Reviewer,admin,Interviewer")]
     public async Task<ActionResult> changeApplicationField(int applicationId, JsonPatchDocument<ApplicationModel> application)
     {
         try
         {
+            Console.WriteLine(1);
             if (application == null)
             {
                 return BadRequest("Request Body Should not be null");
@@ -159,6 +162,7 @@ public class ApplicationController : ControllerBase
             {
                 return BadRequest("No Chnaged Please Try Again");
             }
+            Console.WriteLine(2);
             return NoContent();
         }
         catch (Exception ex)
@@ -238,7 +242,7 @@ public class ApplicationController : ControllerBase
         try
         {
             ReviewFeedbackModel reviewe = await reviewFeebackService.getFeedback(applicationId, employeeId);
-            return Ok(reviewe.comments);
+           return Ok(reviewe?.comments);
         }
         catch (Exception ex)
         {

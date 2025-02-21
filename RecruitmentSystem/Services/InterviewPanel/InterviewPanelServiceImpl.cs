@@ -108,23 +108,4 @@ public class InterviewPanelServiceImpl : IInterviewPanelService
         }
     }
 
-    public async Task<bool> removeInterviwer(int interviwerId)
-    {
-        try
-        {
-            InterviewPanelModel is_interviwer_panel = await getInterviwerById(interviwerId);
-            if (is_interviwer_panel == null)
-            {
-                throw new Exception("Interviwer Not Exist");
-            }
-            await _context.InterviewPanels.Where(i => i.pk_interview_panel_id == interviwerId).ExecuteDeleteAsync();
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            return false;
-        }
-    }
 }

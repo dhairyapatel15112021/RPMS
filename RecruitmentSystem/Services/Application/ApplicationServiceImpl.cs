@@ -26,9 +26,13 @@ public class ApplicationServiceImpl : IApplicationService
     {
         try
         {
+            Console.WriteLine("hi-1");
             var existingApplications = await _context.Applications.Where(a => a.fk_position_id == positionId).ToListAsync();
             var existingsIds = existingApplications.Select(a => a.fk_candidate_id);
+            Console.WriteLine("hi-2");
             var newApplications = ids.Where(id => !existingsIds.Contains(id)).Select(id => new ApplicationModel { fk_candidate_id = id, fk_position_id = positionId });
+            Console.WriteLine("hi-3");
+            Console.WriteLine(newApplications.ToList()[0].applicationStatus);
             await _context.Applications.AddRangeAsync(newApplications);
             await _context.SaveChangesAsync();
             return true;
@@ -127,6 +131,7 @@ public class ApplicationServiceImpl : IApplicationService
     {
         try
         {
+            Console.WriteLine(2);
             ApplicationModel is_application_exist = await getApplicationById(applicationId);
             if (is_application_exist == null)
             {
@@ -151,22 +156,22 @@ public class ApplicationServiceImpl : IApplicationService
             List<ApplicationStatus> reviewIds = [ApplicationStatus.review];
             List<ApplicationStatus> interviewIds = [ApplicationStatus.interview];
 
-            var result = from application in _context.Applications join can in _context.Candidate on application.fk_candidate_id equals can.pk_candidate_id where application.fk_position_id == positionId  && (id == 1 ? ids.Contains(application.applicationStatus) : (id == 3 ? interviewIds.Contains(application.applicationStatus) : reviewIds.Contains(application.applicationStatus)) ) select new { application, can.candidate_name, can.candidate_email, can.cv_path };
-            // from application in _context.Applications join can in _context.Candidate on application.fk_candidate_id equals can.pk_candidate_id where application.fk_position_id == positionId  && (id == 1 ? ids.Contains(application.applicationStatus) : reviewIds.Contains(application.applicationStatus)) select new { application, interview, can.candidate_name, can.candidate_email, can.cv_path };
-            // List<ApplicationModel> applications = await _context.Applications.Where(a => a.fk_position_id == positionId && (id == 1 ? ids.Contains(a.applicationStatus) : reviewIds.Contains(a.applicationStatus))).Include(a => a.InterviewSchedulers).ToListAsync();
-            // Console.WriteLine(applications);
-            List<Applicationdto> applications = new List<Applicationdto>();
-            foreach (var app in result)
+            //var result = from application in _context.Applications join can in _context.Candidate on application.fk_candidate_id equals can.pk_candidate_id where application.fk_position_id == positionId  && (id == 1 ? ids.Contains(application.applicationStatus) : (id == 3 ? interviewIds.Contains(application.applicationStatus) : reviewIds.Contains(application.applicationStatus)) ) select new { application, can.candidate_name, can.candidate_email, can.cv_path };
+            List<Applicationdto> application = await _context.Applications.Where(a => a.fk_position_id == positionId && (id == 1 ? ids.Contains(a.applicationStatus) : (id == 2 ? reviewIds.Contains(a.applicationStatus) : interviewIds.Contains(a.applicationStatus)))).Select(a => new Applicationdto
             {
-                Applicationdto application = new Applicationdto();
-                application.application = app.application;
-                application.candidate_email = app.candidate_email;
-                application.candidate_name = app.candidate_name;
-                application.cv_path = app.cv_path;
-
-                applications.Add(application);
-            }
-            return applications;
+                application = a,
+                candidate_email = a.candidate.candidate_email,
+                candidate_name = a.candidate.candidate_name,
+                cv_path = a.candidate.cv_path,
+                interview = a.InterviewSchedulers.Select(i => new InterviewSchedulerModel
+                {
+                    pk_interview_scheduler_id = i.pk_interview_scheduler_id,
+                    no_of_hr_round = i.no_of_hr_round,
+                    no_of_tech_round = i.no_of_tech_round,
+                    fk_application_id = i.fk_application_id
+                }).ToList()
+            }).ToListAsync();
+            return application;
         }
         catch (Exception ex)
         {

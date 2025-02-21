@@ -37,4 +37,10 @@ public class CandidateModel
 
     public ICollection<ApplicationModel>? Applications { get; }
 
+    public ICollection<CandidateSkillModel>? Skills {get;}
+
+    public ICollection<CandidateExperience>? Experience {get;}
+
+    public ICollection<CandidateEducation>? Education {get;}
+
 }
